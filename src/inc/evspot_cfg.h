@@ -1,3 +1,4 @@
+#pragma once
 #ifndef __EVSIP_CFG_H__
 #define __EVSIP_CFG_H__
 

@@ -1,7 +1,10 @@
+#pragma once
 #ifndef __EVSIP_UTL_H__
 #define __EVSIP_UTL_H__
 
 #define ASSERT(_c_) 
+
+#define NOT_USED(_v_) if (_v_) {}
 
 #define EVSPOT_CHECK_CTX(__CTX__, __CMD__) \
   do { \

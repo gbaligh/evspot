@@ -18,7 +18,9 @@ uint8_t evspot_net_icmpv4_parse(libnet_t *libnet_ctx, uint8_t *raw, size_t raw_l
   size_t n_size;
   uint8_t with_payload = 1;
 
-
+  NOT_USED(libnet_ctx);
+  NOT_USED(with_payload);
+  
   if (raw_len < sizeof(struct libnet_icmpv4_hdr)) {
     return 1;
   }
@@ -26,6 +28,10 @@ uint8_t evspot_net_icmpv4_parse(libnet_t *libnet_ctx, uint8_t *raw, size_t raw_l
   h = (struct libnet_icmpv4_hdr*)raw;
   n_raw = (raw + sizeof(struct libnet_icmpv4_hdr));
   n_size = raw_len - sizeof(struct libnet_icmpv4_hdr);
+  
+  NOT_USED(n_size);
+  NOT_USED(n_raw);
+  NOT_USED(h);
 
 
 /*  libnet_build_udp(

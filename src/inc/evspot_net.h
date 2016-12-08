@@ -1,3 +1,4 @@
+#pragma once
 #ifndef __EVSIP_NET_H__
 #define __EVSIP_NET_H__
 
