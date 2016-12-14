@@ -200,7 +200,7 @@ static void evspot_pcap_handler(u_char *user, const struct pcap_pkthdr *h, const
 {
   struct evspot_dev_s *_pCtx = (struct evspot_dev_s *)user;
 
-  fprintf(stderr, ">==== %s\n", _pCtx->name);
+  fprintf(stderr, ">==== packet on %s with size %d\n", _pCtx->name, h->caplen);
 }
 
 // vim: ts=2:sw=2:expandtab
