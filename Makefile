@@ -8,7 +8,7 @@ SRC_EXT = c
 # Path to the source directory, relative to the makefile
 SRC_PATH = src
 # Space-separated pkg-config libraries used by this project
-LIBS = libevent libconfig
+LIBS = libevent libconfig tokyocabinet
 # General compiler flags
 COMPILE_FLAGS = -Wall -Wextra -g
 # Additional release-specific flags
@@ -18,11 +18,11 @@ DCOMPILE_FLAGS = -D DEBUG -fpack-struct
 # Add additional include paths
 INCLUDES = -I $(SRC_PATH) -I src/inc
 # General linker settings
-LINK_FLAGS = -lnet
+LINK_FLAGS = -lpcap -lnet
 # Additional release-specific linker settings
-RLINK_FLAGS = -lnet
+RLINK_FLAGS = -lnet -lpcap
 # Additional debug-specific linker settings
-DLINK_FLAGS = -lnet
+DLINK_FLAGS = -lnet -lpcap
 # Destination directory, like a jail or mounted system
 DESTDIR = /
 # Install path (bin/ is appended automatically)

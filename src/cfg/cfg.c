@@ -44,7 +44,7 @@ struct evspot_cfg_s {
 
 struct evspot_cfg_key_s evspot_cfg_keys[] = {
   {"url",         CONFIG_TYPE_STRING, offsetof(struct evspot_cfg_opt_s, url),   
-   "UAM server URL to redirect clients to using HTTP 302."},
+   "UAM server URL to redirect clients to, using HTTP 302."},
   {"interface",   CONFIG_TYPE_STRING, offsetof(struct evspot_cfg_opt_s, intf),  
    "Interface for clients packets."},
 };
@@ -164,6 +164,11 @@ evspot_cfg_opt_t *evspot_cfg_get_opt(evspot_cfg_t *pCtx)
   struct evspot_cfg_s *_pCtx = (struct evspot_cfg_s *)pCtx;
 
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSIP_CFG_MAGIC, return NULL);
+
+  if (!_pCtx->initialized) {
+    fprintf(stderr, "Configuration module not initialized yet !\n");
+    return NULL;
+  }
 
   return (evspot_cfg_opt_t *)_pCtx->opt;
 }

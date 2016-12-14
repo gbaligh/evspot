@@ -101,8 +101,11 @@ int main(int argc, char *argv[])
     goto APPEXIT;
   }
 
+  /* Load devices */
+  evspot_net_devadd(ctx.net, opts->intf);
+
   if (evspot_net_start(ctx.net) != 0) {
-    fprintf(stderr, "Error in starting Network stack !");
+    fprintf(stderr, "Error in starting Network!\n");
     goto APPEXIT;
   }
 

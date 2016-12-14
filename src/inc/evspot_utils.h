@@ -2,6 +2,8 @@
 #ifndef __EVSIP_UTL_H__
 #define __EVSIP_UTL_H__
 
+#include <tcutil.h>
+
 #define ASSERT(_c_) 
 
 #define NOT_USED(_v_) if (_v_) {}
