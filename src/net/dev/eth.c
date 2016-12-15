@@ -17,6 +17,8 @@
 #include <evspot_utils.h>
 #include <evspot_net.h>
 
+#define EVSPOT_DEV_MAGIC 0x21432017
+
 struct evspot_dev_s {
   uint32_t magic;
   struct event_base *base;
@@ -59,6 +61,7 @@ uint8_t evspot_dev_init(evspot_dev_t **ppCtx, const char *name, struct event_bas
   _pCtx->base = base;
   
   /* Default values */
+  _pCtx->magic = EVSPOT_DEV_MAGIC;
   _pCtx->direction = PCAP_D_IN;
   _pCtx->libpcap.promisc = 1;
   _pCtx->libpcap.snaplen = 1500;
@@ -75,6 +78,8 @@ uint8_t evspot_dev_open(evspot_dev_t *pCtx)
 {
   struct evspot_dev_s *_pCtx = (struct evspot_dev_s *)pCtx;
   char errbuf[PCAP_ERRBUF_SIZE];
+
+  EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_DEV_MAGIC, return 1);
 
   _pCtx->libpcap.ctx = pcap_create(_pCtx->name, errbuf);
   if (_pCtx->libpcap.ctx == NULL) {
@@ -124,6 +129,8 @@ uint8_t evspot_dev_setpromisc(evspot_dev_t *pCtx, uint8_t promisc)
 {
   struct evspot_dev_s *_pCtx = (struct evspot_dev_s *)pCtx;
 
+  EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_DEV_MAGIC, return 1);
+
   _pCtx->libpcap.promisc = promisc;
   if (pcap_set_promisc(_pCtx->libpcap.ctx, promisc) != 0) {
     fprintf(stderr, "Error setting promisc mode for device %s\n", _pCtx->name);
@@ -136,6 +143,8 @@ uint8_t evspot_dev_setpromisc(evspot_dev_t *pCtx, uint8_t promisc)
 uint8_t evspot_dev_setsnaplen(evspot_dev_t *pCtx, uint32_t snaplen)
 {
   struct evspot_dev_s *_pCtx = (struct evspot_dev_s *)pCtx;
+
+  EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_DEV_MAGIC, return 1);
 
   _pCtx->libpcap.snaplen = snaplen;
   if (pcap_set_snaplen(_pCtx->libpcap.ctx, snaplen) != 0) {
@@ -150,6 +159,8 @@ uint8_t evspot_dev_settimeout(evspot_dev_t *pCtx, uint32_t timeout)
 {
   struct evspot_dev_s *_pCtx = (struct evspot_dev_s *)pCtx;
 
+  EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_DEV_MAGIC, return 1);
+
   _pCtx->libpcap.timeout = timeout;
   if (pcap_set_timeout(_pCtx->libpcap.ctx, timeout) != 0) {
     fprintf(stderr, "Error setting timeout for device %s\n", _pCtx->name);
@@ -163,6 +174,8 @@ uint8_t evspot_dev_close(evspot_dev_t *pCtx)
 {
   struct evspot_dev_s *_pCtx = (struct evspot_dev_s *)pCtx;
 
+  EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_DEV_MAGIC, return 1);
+
   pcap_close(_pCtx->libpcap.ctx);
 
   return 0;
@@ -171,6 +184,8 @@ uint8_t evspot_dev_close(evspot_dev_t *pCtx)
 uint8_t evspot_dev_free(evspot_dev_t *pCtx)
 {
   struct evspot_dev_s *_pCtx = (struct evspot_dev_s *)pCtx;
+
+  EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_DEV_MAGIC, return 1);
 
   tcfree(_pCtx);
 
@@ -181,6 +196,8 @@ static void evspot_dev_event_handler(evutil_socket_t fd, short event, void *arg)
 {
   struct evspot_dev_s *_pCtx = (struct evspot_dev_s *)arg;
   evutil_socket_t _fd = -1;
+
+  EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_DEV_MAGIC, return);
 
   _fd = pcap_get_selectable_fd(_pCtx->libpcap.ctx);
 
@@ -199,6 +216,8 @@ static void evspot_dev_event_handler(evutil_socket_t fd, short event, void *arg)
 static void evspot_pcap_handler(u_char *user, const struct pcap_pkthdr *h, const u_char *bytes)
 {
   struct evspot_dev_s *_pCtx = (struct evspot_dev_s *)user;
+
+  EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_DEV_MAGIC, return);
 
   fprintf(stderr, ">==== packet on %s with size %d\n", _pCtx->name, h->caplen);
 }

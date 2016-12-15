@@ -11,7 +11,7 @@
 #define EVSPOT_CHECK_CTX(__CTX__, __CMD__) \
   do { \
     if (__CTX__ == NULL) { \
-      fprintf(stderr, "NULL context\n"); \
+      TCDPRINTF("NULL context\n"); \
       ASSERT(0); \
       __CMD__; \
     } \
@@ -20,7 +20,7 @@
 #define EVSPOT_CHECK_MAGIC(__CTX__, __MAGIC__, __CMD__) \
   do { \
     if ((__CTX__)->magic != (__MAGIC__)) { \
-      fprintf(stderr, "magic check error %p(%d) inspected %d\n", __CTX__, (__CTX__)->magic, __MAGIC__); \
+      TCDPRINTF("magic check error %p(%d) inspected %d\n", __CTX__, (__CTX__)->magic, __MAGIC__); \
       ASSERT(0); \
       __CMD__; \
     } \
