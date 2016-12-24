@@ -4,13 +4,23 @@
 
 #include <libnet.h>
 
+#include <net/ethernet.h>
+#include <netinet/ip.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
+
 struct event_base;
+
+struct evspot_app_s;
 
 typedef struct evspot_net_ctx_s evspot_net_t;
 
 typedef struct evspot_dev_s evspot_dev_t;
 
-uint8_t evspot_net_init(struct event_base *pBase, evspot_net_t **pCtx);
+typedef struct evspot_stack_s evspot_stack_t;
+
+uint8_t evspot_net_init(struct evspot_app_s *pAppCtx, evspot_net_t **ppCtx);
 
 uint8_t evspot_net_start(evspot_net_t *pCtx);
 
@@ -34,15 +44,7 @@ uint8_t evspot_dev_close(evspot_dev_t *pCtx);
 
 uint8_t evspot_dev_free(evspot_dev_t *pCtx);
 
-uint8_t evspot_net_eth_parse(libnet_t *libnet_ctx, uint8_t *raw, size_t raw_len);
-
-uint8_t evspot_net_ipv4_parse(libnet_t *libnet_ctx, uint8_t *raw, size_t raw_len);
-
-uint8_t evspot_net_tcp_parse(libnet_t *libnet_ctx, uint8_t *raw, size_t raw_len);
-
-uint8_t evspot_net_udp_parse(libnet_t *libnet_ctx, uint8_t *raw, size_t raw_len);
-
-uint8_t evspot_net_icmpv4_parse(libnet_t *libnet_ctx, uint8_t *raw, size_t raw_len);
+uint8_t evspot_net_dev_add(evspot_net_t *pCtx, const char *name);
 
 #endif /* __EVSIP_NET_H__ */
 

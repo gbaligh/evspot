@@ -10,54 +10,32 @@
 
 #include <evspot_utils.h>
 #include <evspot_net.h>
+#include "stack.h"
 
-
-uint8_t evspot_net_ipv4_parse(libnet_t *libnet_ctx, uint8_t *raw, size_t raw_len)
+uint8_t evspot_stack_ipv4(struct evspot_stack_s *pCtx)
 {
-	struct libnet_ipv4_hdr *hip = NULL;
-  uint8_t *n_raw;
-  size_t n_size;
-  uint8_t with_payload = 1;
+  const struct iphdr *h = NULL;
+  uint8_t *raw = pCtx->payload;
+  size_t raw_len = pCtx->payload_len;
+  uint8_t *n_raw = NULL;
+  size_t n_size = 0;
 
-
-  if (raw_len < sizeof(struct libnet_ipv4_hdr)) {
+  if (raw_len < sizeof(struct iphdr)) {
+    TCDPRINTF("Wrong packet size");
     return 1;
   }
 
-	hip = (struct libnet_ipv4_hdr*)raw;
-  n_raw = (raw + sizeof(struct libnet_ipv4_hdr));
-  n_size = raw_len - sizeof(struct libnet_ipv4_hdr);
+  h = (struct iphdr*)raw;
+  n_raw = (raw + sizeof(struct iphdr));
+  n_size = raw_len - sizeof(struct iphdr);
 
-  switch (hip->ip_p) {
-    case IPPROTO_TCP:
-      with_payload = evspot_net_tcp_parse(libnet_ctx, n_raw, n_size);
-      break;
+  pCtx->ipv4 = h;
+  pCtx->payload = n_raw;
+  pCtx->payload_len = n_size;
 
-    case IPPROTO_UDP:
-      with_payload = evspot_net_udp_parse(libnet_ctx, n_raw, n_size);
-      break;
+  TCDPRINTF("Header IPv4");
 
-    case IPPROTO_ICMP:
-      with_payload = evspot_net_icmpv4_parse(libnet_ctx, n_raw, n_size);
-      break;
-
-    default:
-      break;
-  }
-
-	libnet_build_ipv4(
-          ntohs(hip->ip_len),
-          hip->ip_tos, 
-          ntohs(hip->ip_id), 
-          ntohs(hip->ip_off), 
-          hip->ip_ttl, 
-          hip->ip_p, 
-          hip->ip_sum, 
-          ntohl(hip->ip_src.s_addr), 
-          ntohl(hip->ip_dst.s_addr),
-          with_payload?n_raw:0, with_payload?n_size:0, libnet_ctx, 0);
-
-	return 0;
+  return 0;
 }
 
 // vim: ts=2:sw=2:expandtab

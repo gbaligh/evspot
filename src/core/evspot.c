@@ -7,68 +7,63 @@
 #include <evspot_utils.h>
 #include <evspot_cfg.h>
 #include <evspot_net.h>
-
-/**
- * @brief
- */
-typedef struct app_s {
-  struct event_base    *base;           //!< LibEvent Base loop
-  struct event         *evsig;          //!< LibEvent Signal
-  evspot_net_t         *net;
-  evspot_cfg_t         *cfg;
-} app_t;
-
+#include <evspot_core.h>
 
 static void evspot_libevent_log_cb(int severity, const char * msg)
 {
   NOT_USED(severity);
-
-  fprintf(stderr, "[libevent]- %s", msg);
+  TCDPRINTF("[libevent]- %s", msg);
 }
 
 static void evspot_libevent_fatal_cb(int err)
 {
-  fprintf(stderr, "FATAL error detected on libevent %d\n", err);
-  fflush(stderr);
+  TCDPRINTF("FATAL error detected on libevent %d\n", err);
   exit(err);
 } 
 
 static void evspot_signal_cb(evutil_socket_t fd, short event, void * arg)
 {
   NOT_USED(fd);
+  evspot_app_t *_pCtx = (evspot_app_t *)arg;
+  TCDPRINTF("\nSignal (%d) ...\n", event);
 
-  app_t *ctx = (app_t *)arg;
+  (void)event_base_loopexit(_pCtx->base, NULL);
+}
 
-  fprintf(stderr, "\nSignal (%d) ...\n", event);
-
-  (void)event_base_loopexit(ctx->base, NULL);
+static void evspot_tcfatal_cb(const char *msg)
+{
+  TCDPRINTF("EMERG ERROR FATAL: %s", msg);
 }
 
 int main(int argc, char *argv[])
 {
-	app_t ctx;
+  evspot_app_t *_pCtx = pEvspotAppCtx;
   evspot_cfg_opt_t *opts = NULL;
 	int ret = EXIT_SUCCESS;
 
   NOT_USED(argc);
   NOT_USED(argv);
 
+  /* The variable `tcfatalfunc' is the pointer to the call back function for handling a fatal error. */
+  tcfatalfunc = evspot_tcfatal_cb;
+
   /* Init configuration */
-  if (evspot_cfg_init(&(ctx.cfg)) != 0) {
-    fprintf(stderr, "Error initializing configuration\n");
-    return 255;
+  if (evspot_cfg_init(&(_pCtx->cfg)) != 0) {
+    TCDPRINTF("Error initializing configuration\n");
+    return EXIT_FAILURE;
   }
 
   /* Load file */
-  if (evspot_cfg_load(ctx.cfg, "/tmp/evspot.cfg") != 0) {
-    fprintf(stderr, "Error loading configuration file\n");
+  if (evspot_cfg_load(_pCtx->cfg, _pCtx->filecfg) != 0) {
+    TCDPRINTF("Error loading configuration file\n");
+    return EXIT_FAILURE;
   }
 
   /* get all options loaded */
-  opts = evspot_cfg_get_opt(ctx.cfg);
+  opts = evspot_cfg_get_opt(_pCtx->cfg);
   if (opts == NULL) {
-    fprintf(stderr, "FATAL: Options not found %p\n", opts);
-    return 255;
+    TCDPRINTF("FATAL: Options not found %p\n", opts);
+    return EXIT_FAILURE;
   }
 
 	/* Set Log callback for libevent */
@@ -77,60 +72,60 @@ int main(int argc, char *argv[])
   /* Handling fatal errors */
   event_set_fatal_callback(evspot_libevent_fatal_cb);
 
-	ctx.base = event_base_new_with_config(opts->evopt);
-	if (ctx.base == NULL) {
-    fprintf(stderr, "Erro creating libevent pool\n");
-    return 255;
+	_pCtx->base = event_base_new_with_config(opts->evopt);
+	if (_pCtx->base == NULL) {
+    TCDPRINTF("Erro creating libevent pool\n");
+    return EXIT_FAILURE;
 	}
 
-	if (event_base_priority_init(ctx.base, 2) != 0) {
-    fprintf(stderr, "Error setting priority for libevent\n");
+	if (event_base_priority_init(_pCtx->base, 2) != 0) {
+    TCDPRINTF("Error setting priority for libevent\n");
 	}
 
-	ctx.evsig = evsignal_new(ctx.base, SIGINT, &evspot_signal_cb, (void *)&ctx);
-	if (ctx.evsig == NULL) {
-    fprintf(stderr, "Error creating Signal handler\n");
+	_pCtx->evsig = evsignal_new(_pCtx->base, SIGINT, &evspot_signal_cb, (void *)_pCtx);
+	if (_pCtx->evsig == NULL) {
+    TCDPRINTF("Error creating Signal handler\n");
 	}
 
-	if (evsignal_add(ctx.evsig, NULL) != 0) {
-    fprintf(stderr, "Error adding Signal handler into libevent\n");
+	if (evsignal_add(_pCtx->evsig, NULL) != 0) {
+    TCDPRINTF("Error adding Signal handler into libevent\n");
 	}
 
-  if (evspot_net_init(ctx.base, &ctx.net) != 0) {
-    fprintf(stderr, "Could not start Network stack\n");
+  if (evspot_net_init(_pCtx, &_pCtx->net) != 0) {
+    TCDPRINTF("Could not start Network stack\n");
     goto APPEXIT;
   }
 
-  /* Load devices */
-  if (evspot_net_devadd(ctx.net, opts->intf) != 0) {
-    fprintf(stderr, "Error adding interface %s\n", opts->intf);
+  /* Load devices from config */
+  if (evspot_net_dev_add(_pCtx->net, opts->intf) != 0) {
+    TCDPRINTF("Error adding interface %s\n", opts->intf);
   }
 
-  if (evspot_net_start(ctx.net) != 0) {
-    fprintf(stderr, "Error in starting Network!\n");
+  if (evspot_net_start(_pCtx->net) != 0) {
+    TCDPRINTF("Error in starting Network!\n");
     goto APPEXIT;
   }
 
-  fprintf(stdout, "Start EvSpot\n");
-	if (event_base_dispatch(ctx.base) != 0) {
-    fprintf(stderr, "Error starting libevent loop\n");
+  TCDPRINTF("Start EvSpot\n");
+	if (event_base_dispatch(_pCtx->base) != 0) {
+    TCDPRINTF("Error starting libevent loop\n");
     goto APPEXIT;
 	}
-  fprintf(stdout, "Shutting down EvSpot\n");
+  TCDPRINTF("Shutting down EvSpot\n");
 
-  evspot_net_stop(ctx.net);
+  evspot_net_stop(_pCtx->net);
 
-  evspot_net_destroy(ctx.net);
+  evspot_net_destroy(_pCtx->net);
 
 APPEXIT:
 	/* Free SIG */
-  event_free(ctx.evsig);
+  event_free(_pCtx->evsig);
   
   /* Free libEvent */
-	event_base_free(ctx.base);
+	event_base_free(_pCtx->base);
 
   /* Free cfg */  
-  evspot_cfg_destroy(ctx.cfg);
+  evspot_cfg_destroy(_pCtx->cfg);
 
 	return ret;
 }

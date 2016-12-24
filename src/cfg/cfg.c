@@ -62,25 +62,25 @@ uint8_t evspot_cfg_init(evspot_cfg_t **ppCtx)
 {
   struct evspot_cfg_s *_pCtx = (struct evspot_cfg_s *)0;
 
-  _pCtx = (struct evspot_cfg_s *)malloc(sizeof(struct evspot_cfg_s));
+  _pCtx = (struct evspot_cfg_s *)tcmalloc(sizeof(struct evspot_cfg_s));
   if (_pCtx == (struct evspot_cfg_s *)0) {
-    fprintf(stderr, "Memory allocation failed.\n");
+    TCDPRINTF("Memory allocation failed.\n");
     return 1;
   }
 
-  _pCtx->opt = (struct evspot_cfg_opt_s *)malloc(sizeof(struct evspot_cfg_opt_s));
+  _pCtx->opt = (struct evspot_cfg_opt_s *)tcmalloc(sizeof(struct evspot_cfg_opt_s));
   if (_pCtx->opt == (struct evspot_cfg_opt_s *)0) {
-    fprintf(stderr, "Memory allocation failed for options\n");
-    free(_pCtx);
+    TCDPRINTF("Memory allocation failed for options\n");
+    tcfree(_pCtx);
     return 1;
   }
 
   /* default for libevent */
   _pCtx->opt->evopt = event_config_new();
   if (_pCtx->opt->evopt == NULL) {
-    fprintf(stderr, "Could not create libevent config\n");
-    free(_pCtx->opt);
-    free(_pCtx);
+    TCDPRINTF("Could not create libevent config\n");
+    tcfree(_pCtx->opt);
+    tcfree(_pCtx);
     return 1;
   }
 
@@ -101,19 +101,15 @@ uint8_t evspot_cfg_destroy(evspot_cfg_t *pCtx)
 
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSIP_CFG_MAGIC, return 1);
 
-#ifdef DEBUG
-  fprintf(stderr, "%s:%d\n", __FUNCTION__, __LINE__);
-#endif
-
   config_destroy(_pCtx->cfg);
 
   if (_pCtx->opt->evopt != NULL) {
     event_config_free(_pCtx->opt->evopt);
   }
 
-  free(_pCtx->opt);
+  tcfree(_pCtx->opt);
 
-  free(_pCtx);
+  tcfree(_pCtx);
 
   return 0;
 }
@@ -126,12 +122,12 @@ uint8_t evspot_cfg_load(evspot_cfg_t *pCtx, const char *file)
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSIP_CFG_MAGIC, return 1);
 
   if (access(file, R_OK | W_OK) != 0) {
-    fprintf(stderr, "File %s not found.\n", file);
+    TCDPRINTF("File %s not found.\n", file);
     return 1;
   } 
 
   if (config_read_file(_pCtx->cfg, file) != CONFIG_TRUE) {
-    fprintf(stderr, "%s:%d - %s\n",
+    TCDPRINTF("%s:%d - %s\n",
         config_error_file(_pCtx->cfg),
         config_error_line(_pCtx->cfg), 
         config_error_text(_pCtx->cfg));
@@ -139,16 +135,23 @@ uint8_t evspot_cfg_load(evspot_cfg_t *pCtx, const char *file)
   }
 
   for (i=0; i<sizeof(evspot_cfg_keys)/sizeof(evspot_cfg_keys[0]); ++i) {
+    config_setting_t *setting = NULL;
     struct evspot_cfg_key_s key = evspot_cfg_keys[i];
+    setting = config_lookup(_pCtx->cfg, key.path);
+
+    if (config_setting_type(setting) != key.type) {
+      TCDPRINTF("Not compatible configuration detected");
+      return 1;
+    }
+
     switch (key.type) {
       case CONFIG_TYPE_STRING:
         {
           const char *value  = NULL;
           const char **member = (const char **)((char *)_pCtx->opt + key.offset);
-          if (config_lookup_string(_pCtx->cfg, key.path, &value) != 0) {
-            *member = value;
-            fprintf(stderr, "[%s = %s]\n", key.path, *member);
-          }
+          value = config_setting_get_string(setting);
+          *member = value;
+          TCDPRINTF("[%s = %s]\n", key.path, *member);
         }
         break;
       default:
@@ -166,7 +169,7 @@ evspot_cfg_opt_t *evspot_cfg_get_opt(evspot_cfg_t *pCtx)
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSIP_CFG_MAGIC, return NULL);
 
   if (!_pCtx->initialized) {
-    fprintf(stderr, "Configuration module not initialized yet !\n");
+    TCDPRINTF("Configuration module not initialized yet !\n");
     return NULL;
   }
 
