@@ -49,21 +49,21 @@ int main(int argc, char *argv[])
 
   /* Init configuration */
   if (evspot_cfg_init(&(_pCtx->cfg)) != 0) {
-    TCDPRINTF("Error initializing configuration\n");
+    TCDPRINTF("Error initializing configuration");
     return EXIT_FAILURE;
   }
 
   /* Load file */
   if (evspot_cfg_load(_pCtx->cfg, _pCtx->filecfg) != 0) {
-    TCDPRINTF("Error loading configuration file\n");
-    return EXIT_FAILURE;
+    TCDPRINTF("Error loading configuration file");
+    goto APPEXIT;
   }
 
   /* get all options loaded */
   opts = evspot_cfg_get_opt(_pCtx->cfg);
   if (opts == NULL) {
-    TCDPRINTF("FATAL: Options not found %p\n", opts);
-    return EXIT_FAILURE;
+    TCDPRINTF("FATAL: Options not found %p", opts);
+    goto APPEXIT;
   }
 
 	/* Set Log callback for libevent */
@@ -74,44 +74,44 @@ int main(int argc, char *argv[])
 
 	_pCtx->base = event_base_new_with_config(opts->evopt);
 	if (_pCtx->base == NULL) {
-    TCDPRINTF("Erro creating libevent pool\n");
-    return EXIT_FAILURE;
+    TCDPRINTF("Erro creating libevent pool");
+    goto APPEXIT;
 	}
 
 	if (event_base_priority_init(_pCtx->base, 2) != 0) {
-    TCDPRINTF("Error setting priority for libevent\n");
+    TCDPRINTF("Error setting priority for libevent");
 	}
 
 	_pCtx->evsig = evsignal_new(_pCtx->base, SIGINT, &evspot_signal_cb, (void *)_pCtx);
 	if (_pCtx->evsig == NULL) {
-    TCDPRINTF("Error creating Signal handler\n");
+    TCDPRINTF("Error creating Signal handler");
 	}
 
 	if (evsignal_add(_pCtx->evsig, NULL) != 0) {
-    TCDPRINTF("Error adding Signal handler into libevent\n");
+    TCDPRINTF("Error adding Signal handler into libevent");
 	}
 
   if (evspot_net_init(_pCtx, &_pCtx->net) != 0) {
-    TCDPRINTF("Could not start Network stack\n");
+    TCDPRINTF("Could not start Network stack");
     goto APPEXIT;
   }
 
   /* Load devices from config */
   if (evspot_net_dev_add(_pCtx->net, opts->intf) != 0) {
-    TCDPRINTF("Error adding interface %s\n", opts->intf);
+    TCDPRINTF("Error adding interface %s", opts->intf);
   }
 
   if (evspot_net_start(_pCtx->net) != 0) {
-    TCDPRINTF("Error in starting Network!\n");
+    TCDPRINTF("Error in starting Network!");
     goto APPEXIT;
   }
 
-  TCDPRINTF("Start EvSpot\n");
+  TCDPRINTF("Start EvSpot");
 	if (event_base_dispatch(_pCtx->base) != 0) {
-    TCDPRINTF("Error starting libevent loop\n");
+    TCDPRINTF("Error starting libevent loop");
     goto APPEXIT;
 	}
-  TCDPRINTF("Shutting down EvSpot\n");
+  TCDPRINTF("Shutting down EvSpot");
 
   evspot_net_stop(_pCtx->net);
 

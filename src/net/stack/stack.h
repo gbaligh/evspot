@@ -4,6 +4,9 @@
 
 
 struct evspot_stack_s {
+  /* magic */
+  uint32_t magic;
+
   /* Raw */
   uint8_t *raw;
   size_t raw_len;

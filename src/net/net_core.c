@@ -29,13 +29,13 @@ uint8_t evspot_net_init(struct evspot_app_s *pAppCtx, evspot_net_t **ppCtx)
   struct evspot_net_ctx_s *_pCtx = NULL;
 
   if (pAppCtx == NULL) {
-    TCDPRINTF("Event base is NULL\n");
+    TCDPRINTF("Event base is NULL");
     return 1;
   }
 
   _pCtx = (struct evspot_net_ctx_s *)tcmalloc(sizeof(struct evspot_net_ctx_s));
   if (_pCtx == NULL) {
-    TCDPRINTF("allocation failed\n");
+    TCDPRINTF("allocation failed");
     return 1;
   }
 
@@ -43,7 +43,7 @@ uint8_t evspot_net_init(struct evspot_app_s *pAppCtx, evspot_net_t **ppCtx)
   
   _pCtx->devs = tcptrlistnew(); 
   if (_pCtx->devs == NULL) {
-    TCDPRINTF("Error creating devices list\n");
+    TCDPRINTF("Error creating devices list");
     tcfree(_pCtx);
     return 1;
   }
@@ -65,7 +65,7 @@ uint8_t evspot_net_start(evspot_net_t *pCtx)
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_NET_CTX_MAGIC, return 1);
 
   if ((numDev = tcptrlistnum(_pCtx->devs)) == 0) {
-    TCDPRINTF("Error: no device created for network\n");
+    TCDPRINTF("Error: no device created for network");
     return 1;
   }
 
@@ -73,14 +73,14 @@ uint8_t evspot_net_start(evspot_net_t *pCtx)
     evspot_dev_t *_pDevCtx = tcptrlistval(_pCtx->devs, _i);
 
     if (evspot_dev_open(_pDevCtx) != 0) {
-      TCDPRINTF("Error starting device %p\n", _pDevCtx);
+      TCDPRINTF("Error starting device %p", _pDevCtx);
       continue;
     }
     _aDev++;
   }
 
   if (!_aDev) {
-    TCDPRINTF("No active device: %d\n", _aDev);
+    TCDPRINTF("No active device: %d", _aDev);
     return 1;
   }
 
@@ -95,11 +95,11 @@ uint8_t evspot_net_dev_add(evspot_net_t *pCtx, const char *name)
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_NET_CTX_MAGIC, return 1);
 
   if (evspot_dev_init(&_pDevCtx, name, _pCtx->app->base) != 0) {
-    TCDPRINTF("Error initializing device %s\n", name);
+    TCDPRINTF("Error initializing device %s", name);
     return 1;
   }
 
-  TCDPRINTF("New device created (%s:%p)\n", name, _pDevCtx);
+  TCDPRINTF("New device created (%s:%p)", name, _pDevCtx);
 
   tcptrlistpush(_pCtx->devs, _pDevCtx);
 

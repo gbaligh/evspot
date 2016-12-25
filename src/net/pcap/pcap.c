@@ -20,7 +20,7 @@
 #define EVSPOT_PCAP_MAGIC 0x23002017
 
 struct evspot_pcap_s {
-  int magic;
+  uint32_t magic;
   pcap_t *pcap;
   uint32_t snaplen;
   uint32_t timeout;

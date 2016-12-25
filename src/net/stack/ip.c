@@ -29,6 +29,11 @@ uint8_t evspot_stack_ipv4(struct evspot_stack_s *pCtx)
   n_raw = (raw + sizeof(struct iphdr));
   n_size = raw_len - sizeof(struct iphdr);
 
+  if (h->version != 0x4) {
+    TCDPRINTF("Only IPv4 is supported");
+    return 1;
+  }
+
   pCtx->ipv4 = h;
   pCtx->payload = n_raw;
   pCtx->payload_len = n_size;
