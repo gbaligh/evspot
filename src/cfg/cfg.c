@@ -121,7 +121,7 @@ uint8_t evspot_cfg_load(evspot_cfg_t *pCtx, const char *file)
 
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSIP_CFG_MAGIC, return 1);
 
-  if (access(file, R_OK | W_OK) != 0) {
+  if (access(file, R_OK) != 0) {
     TCDPRINTF("File %s not found.", file);
     return 1;
   } 
@@ -138,6 +138,9 @@ uint8_t evspot_cfg_load(evspot_cfg_t *pCtx, const char *file)
     config_setting_t *setting = NULL;
     struct evspot_cfg_key_s key = evspot_cfg_keys[i];
     setting = config_lookup(_pCtx->cfg, key.path);
+    if (setting == NULL) {
+      continue;
+    }
 
     if (config_setting_type(setting) != key.type) {
       TCDPRINTF("Not compatible configuration detected");
