@@ -96,6 +96,10 @@ uint8_t evspot_stack_vlan(struct evspot_stack_s *pCtx)
   n_raw = (raw + sizeof(struct vlan_tag));
   n_size = raw_len - sizeof(struct vlan_tag);
 
+  //pCtx->eth = h;
+  pCtx->payload = n_raw;
+  pCtx->payload_len = n_size;
+
   TCDPRINTF("Header VLAN");
 
   return evspot_stack_eth_parser(pCtx, ntohs(h->vlan_tci));

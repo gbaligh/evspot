@@ -17,6 +17,7 @@
 #include <evspot_utils.h>
 #include <evspot_net.h>
 #include "../link/link.h"
+#include "../stack/stack.h"
 
 #define EVSPOT_DEV_MAGIC 0x21432017
 
@@ -93,8 +94,6 @@ uint8_t evspot_dev_init(evspot_dev_t **ppCtx, const char *name, struct event_bas
 uint8_t evspot_dev_open(evspot_dev_t *pCtx)
 {
   struct evspot_dev_s *_pCtx = (struct evspot_dev_s *)pCtx;
-  char errbuf[PCAP_ERRBUF_SIZE];
-  int _fd = -1;
 
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_DEV_MAGIC, return 1);
 
@@ -141,8 +140,16 @@ uint8_t evspot_dev_free(evspot_dev_t *pCtx)
 static void evspot_dev_event_handler(evutil_socket_t fd, short event, void *arg)
 {
   struct evspot_dev_s *_pCtx = (struct evspot_dev_s *)arg;
+  int _fd = -1;
 
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_DEV_MAGIC, return);
+
+  evspot_link_getfd(_pCtx->link, &_fd);
+
+  if (fd != _fd) {
+    TCDPRINTF("Event from socket(%d) not from %d", fd, _fd);
+    return;
+  }
 
   if (event & EV_READ) {
     TCDPRINTF("New READ event detected on device %s", _pCtx->name);
@@ -153,10 +160,8 @@ static void evspot_dev_event_handler(evutil_socket_t fd, short event, void *arg)
 static void evspot_dev_link_handler(void *pCtx, const size_t s, const uint8_t *bytes)
 {
   struct evspot_dev_s *_pCtx = (struct evspot_dev_s *)pCtx;
-
+  
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_DEV_MAGIC, return);
-
-  TCDPRINTF(">==== packet on %s with size %d", _pCtx->name, s);
 
   if (s == 0) {
     return;
@@ -166,7 +171,7 @@ static void evspot_dev_link_handler(void *pCtx, const size_t s, const uint8_t *b
     return;
   }
  
-  evspot_stack_parse(_pCtx->stack, bytes, s);
+  evspot_stack_parse(_pCtx->stack, (uint8_t *)bytes, s);
 }
 
 // vim: ts=2:sw=2:expandtab

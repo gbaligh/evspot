@@ -23,7 +23,7 @@ struct evspot_stack_s {
   /* PPP */
 
   /* IPv4/IPv6 */
-  struct iphdr *ipv4;
+  const struct iphdr *ipv4;
 
   /* TCP/UDP */
 };
@@ -33,6 +33,12 @@ uint8_t evspot_stack_eth(struct evspot_stack_s *pCtx);
 uint8_t evspot_stack_vlan(struct evspot_stack_s *pCtx);
 
 uint8_t evspot_stack_ipv4(struct evspot_stack_s *pCtx);
+
+uint8_t evspot_stack_init(evspot_stack_t **ppCtx);
+
+uint8_t evspot_stack_parse(evspot_stack_t *pCtx, uint8_t *raw, size_t raw_len);
+
+uint8_t evspot_stack_free(evspot_stack_t *pCtx);
 
 #endif /* __EVSIP_NET_STACK_H__ */
 // vim: ts=2:sw=2:expandtab

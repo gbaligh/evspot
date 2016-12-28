@@ -43,11 +43,11 @@ uint8_t evspot_link_start(evspot_link_t *pCtx);
 
 uint8_t evspot_link_getfd(evspot_link_t *pCtx, int *pfd);
 
+uint8_t evspot_link_read(evspot_link_t *pCtx, void *user, void (*cb)(void*,const size_t, const uint8_t*));
+
 uint8_t evspot_link_stop(evspot_link_t *pCtx);
 
 uint8_t evspot_link_free(evspot_link_t *pCtx);
-
-
 
 #endif /* __EVSPOT_NET_LINK_H__ */
 // vim: ts=2:sw=2:expandtab

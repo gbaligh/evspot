@@ -49,7 +49,7 @@ uint8_t evspot_pcap_init(evspot_link_t **ppCtx, const char *name)
     return 1;
   }
 
-  *ppCtx = _pCtx;
+  *ppCtx = (evspot_link_t *)_pCtx;
 
   return 0;
 }
