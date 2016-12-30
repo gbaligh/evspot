@@ -43,40 +43,43 @@ static uint8_t evspot_stack_eth_parser(struct evspot_stack_s *pCtx, uint16_t eth
         return gUpper[_i].stack_cb(pCtx);
       }
       else {
-        TCDPRINTF("Header %s not supported", gUpper[_i].desc);
+        //TCDPRINTF("Header %s not supported", gUpper[_i].desc);
         return 0;
       }
     }
   }
 
-  TCDPRINTF("Ethernet type 0x%2X not supported", ethtype);
+  //TCDPRINTF("Ethernet type 0x%2X not supported", ethtype);
   return 0;
 }
 
 uint8_t evspot_stack_eth(struct evspot_stack_s *pCtx)
 {
-  const struct ether_header *h = NULL;
+  const struct ethhdr *h = NULL;
   uint8_t *raw = pCtx->payload;
   size_t raw_len = pCtx->payload_len;
   uint8_t *n_raw = NULL;
   size_t n_size = 0;
 
-  if (raw_len < sizeof(struct ether_header)) {
+  if (raw_len < sizeof(struct ethhdr)) {
     TCDPRINTF("Wrong packet size");
     return 1;
   }
 
-  h = (struct ether_header*)raw;
-  n_raw = (raw + sizeof(struct ether_header));
-  n_size = raw_len - sizeof(struct ether_header);
+  h = (struct ethhdr*)raw;
+  n_raw = (raw + sizeof(struct ethhdr));
+  n_size = raw_len - sizeof(struct ethhdr);
 
   pCtx->eth = h;
   pCtx->payload = n_raw;
   pCtx->payload_len = n_size;
 
   TCDPRINTF("Header Ethernet");
+  TCDPRINTF("   |-%-21s : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X", "Destination Address", h->h_dest[0] , h->h_dest[1] , h->h_dest[2] , h->h_dest[3] , h->h_dest[4] , h->h_dest[5] );
+  TCDPRINTF("   |-%-21s : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X", "Source Address", h->h_source[0] , h->h_source[1] , h->h_source[2] , h->h_source[3] , h->h_source[4] , h->h_source[5] );
+  TCDPRINTF("   |-%-21s : %u", "Protocol", (unsigned short)h->h_proto);
 
-  return evspot_stack_eth_parser(pCtx, ntohs(h->ether_type));
+  return evspot_stack_eth_parser(pCtx, ntohs(h->h_proto));
 }
 
 uint8_t evspot_stack_vlan(struct evspot_stack_s *pCtx)

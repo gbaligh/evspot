@@ -19,8 +19,10 @@ uint8_t evspot_stack_ipv4(struct evspot_stack_s *pCtx)
   size_t raw_len = pCtx->payload_len;
   uint8_t *n_raw = NULL;
   size_t n_size = 0;
+  struct in_addr source, dest;
 
-  if (raw_len < sizeof(struct iphdr)) {
+
+  if (raw_len < sizeof(struct ip)) {
     TCDPRINTF("Wrong packet size");
     return 1;
   }
@@ -38,7 +40,19 @@ uint8_t evspot_stack_ipv4(struct evspot_stack_s *pCtx)
   pCtx->payload = n_raw;
   pCtx->payload_len = n_size;
 
-  TCDPRINTF("Header IPv4");
+  memset(&source, 0, sizeof(source));
+  source.s_addr = h->saddr;
+
+  memset(&dest, 0, sizeof(dest));
+  dest.s_addr = h->daddr;
+
+  TCDPRINTF("Header IP");
+  TCDPRINTF("   |-%-21s : %d", "IP Version", (unsigned int)h->version);
+  TCDPRINTF("   |-%-21s : %d", "TTL", (unsigned int)h->ttl);
+  TCDPRINTF("   |-%-21s : %d", "Protocol", (unsigned int)h->protocol);
+  TCDPRINTF("   |-%-21s : %d", "Checksum", ntohs(h->check));
+  TCDPRINTF("   |-%-21s : %s", "Source IP", inet_ntoa(source));
+  TCDPRINTF("   |-%-21s : %s", "Destination IP", inet_ntoa(dest));
 
   return 0;
 }

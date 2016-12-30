@@ -14,7 +14,7 @@ struct evspot_stack_s {
   size_t payload_len;
 
   /* Ethernet */
-  const struct ether_header *eth;
+  const struct ethhdr *eth;
 
   /* VLAN */
 
