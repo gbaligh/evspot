@@ -23,8 +23,7 @@
 uint8_t evspot_pcap_init(evspot_link_t **ppCtx, const char *name)
 {
   struct evspot_pcap_s *_pCtx = (struct evspot_pcap_s *)0;
-  char errbuf[PCAP_ERRBUF_SIZE];
-
+ 
   _pCtx = (struct evspot_pcap_s *)tcmalloc(sizeof(struct evspot_pcap_s));
   if (_pCtx == (struct evspot_pcap_s *)0) {
     TCDPRINTF("Error memory allocation");
@@ -40,16 +39,6 @@ uint8_t evspot_pcap_init(evspot_link_t **ppCtx, const char *name)
   _pCtx->timeout = 500;
   _pCtx->verbose = 1;
 
-#ifdef DEBUG
-  _pCtx->pcap = pcap_open_offline("/tmp/evspot.pcap", errbuf);
-#else
-  _pCtx->pcap = pcap_create(_pCtx->name, errbuf);
-#endif
-  if (_pCtx->pcap == NULL) {
-    tcfree(_pCtx);
-    return 1;
-  }
-
   *ppCtx = (evspot_link_t *)_pCtx;
 
   return 0;
@@ -62,7 +51,17 @@ uint8_t evspot_pcap_start(evspot_link_t *pCtx)
 
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_PCAP_MAGIC, return 1);
 
- if (pcap_can_set_rfmon(_pCtx->pcap)) {
+#ifdef DEBUG
+  _pCtx->pcap = pcap_open_offline("/tmp/evspot.pcap", errbuf);
+#else
+  _pCtx->pcap = pcap_create(_pCtx->name, errbuf);
+#endif
+  if (_pCtx->pcap == NULL) {
+    TCDPRINTF("Error creating pcap handler");
+    return 1;
+  }
+
+  if (pcap_can_set_rfmon(_pCtx->pcap)) {
     if (pcap_set_rfmon(_pCtx->pcap, 1) < 0) {
       TCDPRINTF("Error rfmon");
     }
@@ -87,6 +86,7 @@ uint8_t evspot_pcap_start(evspot_link_t *pCtx)
 
   if (pcap_activate(_pCtx->pcap) != 0) {
     TCDPRINTF("Error activate libpcap [%s] for device %s", pcap_geterr(_pCtx->pcap), _pCtx->name);
+    pcap_close(_pCtx->pcap);
     return 1;
   }
 #endif
@@ -132,9 +132,9 @@ uint8_t evspot_pcap_read(evspot_link_t *pCtx, void *user, void (*cb)(void*,const
   const u_char *pkt_data = NULL;
   int _ret = -2;
 
-
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_PCAP_MAGIC, return 1);
 
+READAGAIN:
   _ret = pcap_next_ex(_pCtx->pcap, &pkt_header, &pkt_data);
   switch (_ret) {
     /* if the packet was read without problems */
@@ -145,6 +145,7 @@ uint8_t evspot_pcap_read(evspot_link_t *pCtx, void *user, void (*cb)(void*,const
       break;
     /* if an error occurred while reading the packet */
     case -1:
+      TCDPRINTF("Error pcap_next(): %s", pcap_geterr(_pCtx->pcap));
       return 1;
     /* if  packets  are  being read  from  a  ``savefile''  and  there  are  no  more  packets to read from the savefile */
     case -2:
@@ -156,6 +157,7 @@ uint8_t evspot_pcap_read(evspot_link_t *pCtx, void *user, void (*cb)(void*,const
 
   if (cb != NULL) {
     cb(user, pkt_header->caplen, pkt_data);
+    if (_ret == 1) goto READAGAIN;
   }
 
   return 0;
@@ -164,19 +166,10 @@ uint8_t evspot_pcap_read(evspot_link_t *pCtx, void *user, void (*cb)(void*,const
 uint8_t evspot_pcap_stop(evspot_link_t *pCtx)
 {
   struct evspot_pcap_s *_pCtx = (struct evspot_pcap_s *)pCtx;
+  struct pcap_stat stats;
 
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_PCAP_MAGIC, return 1);
  
-  return 0;
-}
-
-uint8_t evspot_pcap_free(evspot_link_t *pCtx)
-{
-  struct evspot_pcap_s *_pCtx = (struct evspot_pcap_s *)pCtx;
-  struct pcap_stat stats;
-  
-  EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_PCAP_MAGIC, return 1);
-  
   if (pcap_stats(_pCtx->pcap, &stats) >= 0)
   {
     TCDPRINTF("Interface %s", _pCtx->name);
@@ -184,9 +177,18 @@ uint8_t evspot_pcap_free(evspot_link_t *pCtx)
     TCDPRINTF("\t%d packets dropped", stats.ps_drop);
     TCDPRINTF("\t%d packet dropped by kernel", stats.ps_ifdrop);
   }
-
+ 
   pcap_close(_pCtx->pcap);
 
+  return 0;
+}
+
+uint8_t evspot_pcap_free(evspot_link_t *pCtx)
+{
+  struct evspot_pcap_s *_pCtx = (struct evspot_pcap_s *)pCtx;
+  
+  EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_PCAP_MAGIC, return 1);
+ 
   tcfree(_pCtx);
 
   return 0;

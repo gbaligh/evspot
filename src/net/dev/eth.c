@@ -82,7 +82,7 @@ uint8_t evspot_dev_init(evspot_dev_t **ppCtx, const char *name, struct event_bas
 uint8_t evspot_dev_open(evspot_dev_t *pCtx)
 {
   struct evspot_dev_s *_pCtx = (struct evspot_dev_s *)pCtx;
-  struct timeval  tv[1] = {{0, 500}};
+  struct timeval  tv[1] = {{0, 5}};
   int _fd = -1;
 
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_DEV_MAGIC, return 1);
