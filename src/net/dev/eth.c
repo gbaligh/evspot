@@ -30,12 +30,12 @@ struct evspot_dev_s {
   evspot_link_t *link;
 
   const char *name;
-  uint8_t idx;
+  uint32_t index;
   struct in_addr ipv4;
   struct in_addr mask;
-  struct in_addr brcst;
+  struct in_addr broadaddr;
   uint32_t mtu;
-  uint32_t kflags;
+  uint16_t flags;
 };
 
 static void evspot_dev_event_handler(evutil_socket_t fd, short event, void *arg);
@@ -45,6 +45,8 @@ static void evspot_dev_link_handler(void *pCtx, const size_t s, const uint8_t *b
 uint8_t evspot_dev_init(evspot_dev_t **ppCtx, const char *name, struct event_base *base)
 {
   struct evspot_dev_s *_pCtx = (struct evspot_dev_s *)0;
+  int _fd = -1;
+  struct ifreq ifr;
 
   _pCtx = (struct evspot_dev_s *)tcmalloc(sizeof(struct evspot_dev_s));
   if (_pCtx == (struct evspot_dev_s *)0) {
@@ -67,13 +69,40 @@ uint8_t evspot_dev_init(evspot_dev_t **ppCtx, const char *name, struct event_bas
     tcfree(_pCtx);
     return 1;
   }
-   
+
   _pCtx->name = name;
   _pCtx->base = base;
   _pCtx->magic = EVSPOT_DEV_MAGIC;
- 
- 
-  /* Ok */
+
+  _fd = socket(AF_INET, SOCK_DGRAM, 0);
+  if (_fd < 0) {
+    TCDPRINTF("Error reading socket for device %s", _pCtx->name);
+  } else {
+    ifr.ifr_addr.sa_family = AF_INET;
+    strncpy(ifr.ifr_name, _pCtx->name, IFNAMSIZ-1);
+    ioctl(_fd, SIOCGIFADDR, &ifr); 
+    _pCtx->ipv4 = ((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr;
+    ioctl(_fd, SIOCGIFNETMASK, &ifr);
+    _pCtx->mask = ((struct sockaddr_in *)&ifr.ifr_netmask)->sin_addr;
+    ioctl(_fd, SIOCGIFBRDADDR, &ifr);
+    _pCtx->broadaddr = ((struct sockaddr_in *)&ifr.ifr_broadaddr)->sin_addr;
+    ioctl(_fd, SIOCGIFMTU, &ifr);
+    _pCtx->mtu = ifr.ifr_mtu;
+    ioctl(_fd, SIOCGIFFLAGS, &ifr);
+    _pCtx->flags = ifr.ifr_flags;
+    ioctl(_fd, SIOCGIFINDEX, &ifr);
+    _pCtx->index = ifr.ifr_ifindex;
+    close(_fd);
+  }
+
+  TCDPRINTF("Device %s[%d]", _pCtx->name, _pCtx->index); 
+  TCDPRINTF("Device %s[%s]", _pCtx->name, inet_ntoa(_pCtx->ipv4));
+  TCDPRINTF("Device %s[%s]", _pCtx->name, inet_ntoa(_pCtx->mask)); 
+  TCDPRINTF("Device %s[%s]", _pCtx->name, inet_ntoa(_pCtx->broadaddr)); 
+  TCDPRINTF("Device %s[%d]", _pCtx->name, _pCtx->mtu);
+  TCDPRINTF("Device %s[0x%4X]", _pCtx->name, _pCtx->flags);
+
+    /* Ok */
   *ppCtx = _pCtx;
 
   return 0;
@@ -91,7 +120,6 @@ uint8_t evspot_dev_open(evspot_dev_t *pCtx)
 
   if (evspot_link_getfd(_pCtx->link, &_fd) != 0) {
     TCDPRINTF("Link failure for device %s", _pCtx->name);
-    tcfree(_pCtx);
     return 1;
   }
 

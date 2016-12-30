@@ -9,7 +9,9 @@
 struct evspot_link_s {
   uint32_t magic;
   uint32_t type;
+  const char *name;
 };
+typedef struct evspot_link_s evspot_link_t;
 
 struct evspot_pcap_s {
   uint32_t magic;
@@ -23,8 +25,6 @@ struct evspot_pcap_s {
   uint8_t verbose;
 };
 typedef struct evspot_pcap_s evspot_pcap_t;
-
-typedef struct evspot_link_s evspot_link_t;
 
 struct evspot_link_ops_s {
   uint8_t (*init)(evspot_link_t **ppCtx, const char *name);

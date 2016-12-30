@@ -52,15 +52,17 @@ uint8_t evspot_pcap_start(evspot_link_t *pCtx)
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_PCAP_MAGIC, return 1);
 
 #ifdef DEBUG
+  TCDPRINTF("Using the offline file /tmp/evspot.pcap");
   _pCtx->pcap = pcap_open_offline("/tmp/evspot.pcap", errbuf);
 #else
   _pCtx->pcap = pcap_create(_pCtx->name, errbuf);
 #endif
   if (_pCtx->pcap == NULL) {
-    TCDPRINTF("Error creating pcap handler");
+    TCDPRINTF("Error creating pcap handler: %s", errbuf);
     return 1;
   }
 
+#ifndef DEBUG 
   if (pcap_can_set_rfmon(_pCtx->pcap)) {
     if (pcap_set_rfmon(_pCtx->pcap, 1) < 0) {
       TCDPRINTF("Error rfmon");
@@ -79,7 +81,6 @@ uint8_t evspot_pcap_start(evspot_link_t *pCtx)
     TCDPRINTF("Error timeout");
   }
 
-#ifndef DEBUG
   if (pcap_setdirection(_pCtx->pcap, _pCtx->direction) < 0) {
     TCDPRINTF("Error setting direction for device %s: %s", _pCtx->name, pcap_geterr(_pCtx->pcap));
   }
@@ -89,13 +90,13 @@ uint8_t evspot_pcap_start(evspot_link_t *pCtx)
     pcap_close(_pCtx->pcap);
     return 1;
   }
-#endif
 
   if (!pcap_getnonblock(_pCtx->pcap, errbuf)) {
     if (pcap_setnonblock(_pCtx->pcap, 1, errbuf) < 0) {
       TCDPRINTF("Error setting nonblock for device %s: %s", _pCtx->name, errbuf);
     }
   }
+#endif
 
   TCDPRINTF("Using %s with device %s: DATALINK(%s:%s)",
       pcap_lib_version(),
