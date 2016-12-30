@@ -76,6 +76,8 @@ uint8_t evspot_net_start(evspot_net_t *pCtx)
       TCDPRINTF("Error starting device %p", _pDevCtx);
       continue;
     }
+
+    TCDPRINTF("Started capture on device %p", _pDevCtx);
     _aDev++;
   }
 

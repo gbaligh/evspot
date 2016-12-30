@@ -45,7 +45,6 @@ static void evspot_dev_link_handler(void *pCtx, const size_t s, const uint8_t *b
 uint8_t evspot_dev_init(evspot_dev_t **ppCtx, const char *name, struct event_base *base)
 {
   struct evspot_dev_s *_pCtx = (struct evspot_dev_s *)0;
-  int _fd = -1;
 
   _pCtx = (struct evspot_dev_s *)tcmalloc(sizeof(struct evspot_dev_s));
   if (_pCtx == (struct evspot_dev_s *)0) {
@@ -73,18 +72,7 @@ uint8_t evspot_dev_init(evspot_dev_t **ppCtx, const char *name, struct event_bas
   _pCtx->base = base;
   _pCtx->magic = EVSPOT_DEV_MAGIC;
  
-  if (evspot_link_getfd(_pCtx->link, &_fd) != 0) {
-    TCDPRINTF("Link failure for device %s", name);
-    tcfree(_pCtx);
-    return 1;
-  }
-
-  _pCtx->ev = event_new(_pCtx->base, 
-      _fd, 
-      EV_READ|EV_PERSIST, 
-      evspot_dev_event_handler, 
-      _pCtx);
-
+ 
   /* Ok */
   *ppCtx = _pCtx;
 
@@ -94,16 +82,30 @@ uint8_t evspot_dev_init(evspot_dev_t **ppCtx, const char *name, struct event_bas
 uint8_t evspot_dev_open(evspot_dev_t *pCtx)
 {
   struct evspot_dev_s *_pCtx = (struct evspot_dev_s *)pCtx;
+  struct timeval  tv[1] = {{0, 500}};
+  int _fd = -1;
 
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_DEV_MAGIC, return 1);
-
+ 
   evspot_link_start(_pCtx->link);
 
-  if (event_add(_pCtx->ev, 0) != 0) {
-    TCDPRINTF("Error adding libpcap event");
+  if (evspot_link_getfd(_pCtx->link, &_fd) != 0) {
+    TCDPRINTF("Link failure for device %s", _pCtx->name);
+    tcfree(_pCtx);
     return 1;
   }
 
+  _pCtx->ev = event_new(_pCtx->base, _fd, EV_READ|EV_PERSIST, evspot_dev_event_handler, _pCtx);
+  if (_pCtx->ev == NULL) {
+    TCDPRINTF("Error creating event");
+    return 1;
+  }
+
+  if (event_add(_pCtx->ev, tv) != 0) {
+    TCDPRINTF("Error adding libpcap event");
+    return 1;
+  }
+  
   return 0;
 }
 
@@ -117,6 +119,8 @@ uint8_t evspot_dev_close(evspot_dev_t *pCtx)
 
   event_del(_pCtx->ev);
 
+  event_free(_pCtx->ev);
+
   return 0;
 }
 
@@ -129,8 +133,6 @@ uint8_t evspot_dev_free(evspot_dev_t *pCtx)
   evspot_stack_free(_pCtx->stack);
 
   evspot_link_free(_pCtx->link);
-
-  event_free(_pCtx->ev);
 
   tcfree(_pCtx);
 
