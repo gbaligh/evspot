@@ -17,7 +17,7 @@ uint8_t evspot_stack_init(evspot_stack_t **ppCtx)
 
   _pCtx = (struct evspot_stack_s *)tcmalloc(sizeof(struct evspot_stack_s));
   if (_pCtx == (struct evspot_stack_s *)0) {
-    TCDPRINTF("Error allocation\n");
+    _E("Error allocation\n");
     return 1;
   }
   memset(_pCtx, 0, sizeof(struct evspot_stack_s));

@@ -58,14 +58,14 @@ uint8_t evspot_dev_init(evspot_dev_t **ppCtx, const char *name, const uint32_t t
 
   /* init stack for this device */
   if (evspot_stack_init(&_pCtx->stack) != 0) {
-    TCDPRINTF("Stack init failure for device %s", name);
+    _E("Stack init failure for device %s", name);
     tcfree(_pCtx);
     return 1;
   }
 
   /* init link for this device */
   if (evspot_link_init(&_pCtx->link, linktype, name) != 0) {
-    TCDPRINTF("Link init failure for device %s", name);
+    _E("Link init failure for device %s", name);
     evspot_stack_free(_pCtx->stack);
     tcfree(_pCtx);
     return 1;
@@ -78,7 +78,7 @@ uint8_t evspot_dev_init(evspot_dev_t **ppCtx, const char *name, const uint32_t t
   if (linktype != EVSPOT_LINK_TYPE_PCAPOFF) {
     _fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (_fd < 0) {
-      TCDPRINTF("Error reading socket for device %s", _pCtx->name);
+      _E("Error reading socket for device %s", _pCtx->name);
     } else {
       ifr.ifr_addr.sa_family = AF_INET;
       strncpy(ifr.ifr_name, _pCtx->name, IFNAMSIZ-1);
@@ -97,12 +97,12 @@ uint8_t evspot_dev_init(evspot_dev_t **ppCtx, const char *name, const uint32_t t
       close(_fd);
     }
 
-    TCDPRINTF("Device %s[%d]", _pCtx->name, _pCtx->index); 
-    TCDPRINTF("Device %s[%s]", _pCtx->name, inet_ntoa(_pCtx->ipv4));
-    TCDPRINTF("Device %s[%s]", _pCtx->name, inet_ntoa(_pCtx->mask)); 
-    TCDPRINTF("Device %s[%s]", _pCtx->name, inet_ntoa(_pCtx->broadaddr)); 
-    TCDPRINTF("Device %s[%d]", _pCtx->name, _pCtx->mtu);
-    TCDPRINTF("Device %s[0x%4X]", _pCtx->name, _pCtx->flags);
+    _D("Device %s[%d]", _pCtx->name, _pCtx->index); 
+    _D("Device %s[%s]", _pCtx->name, inet_ntoa(_pCtx->ipv4));
+    _D("Device %s[%s]", _pCtx->name, inet_ntoa(_pCtx->mask)); 
+    _D("Device %s[%s]", _pCtx->name, inet_ntoa(_pCtx->broadaddr)); 
+    _D("Device %s[%d]", _pCtx->name, _pCtx->mtu);
+    _D("Device %s[0x%4X]", _pCtx->name, _pCtx->flags);
   }
 
   /* Ok */
@@ -122,22 +122,22 @@ uint8_t evspot_dev_open(evspot_dev_t *pCtx)
   evspot_link_start(_pCtx->link);
 
   if (evspot_link_getfd(_pCtx->link, &_fd) != 0) {
-    TCDPRINTF("Link failure for device %s", _pCtx->name);
+    _E("Link failure for device %s", _pCtx->name);
     return 1;
   }
 
   _pCtx->ev = event_new(_pCtx->base, _fd, EV_READ|EV_PERSIST, evspot_dev_event_handler, _pCtx);
   if (_pCtx->ev == NULL) {
-    TCDPRINTF("Error creating event");
+    _E("Error creating event");
     return 1;
   }
 
   if (event_priority_set(_pCtx->ev, 1) != 0) {
-    TCDPRINTF("Error setting priority for event");
+    _E("Error setting priority for event");
   }
 
   if (event_add(_pCtx->ev, tv) != 0) {
-    TCDPRINTF("Error adding libpcap event");
+    _E("Error adding libpcap event");
     return 1;
   }
   
@@ -184,7 +184,7 @@ static void evspot_dev_event_handler(evutil_socket_t fd, short event, void *arg)
   evspot_link_getfd(_pCtx->link, &_fd);
 
   if (fd != _fd) {
-    TCDPRINTF("Event from socket(%d) not from %d", fd, _fd);
+    _E("Event from socket(%d) not from %d", fd, _fd);
     return;
   }
 

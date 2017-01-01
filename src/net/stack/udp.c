@@ -27,7 +27,7 @@ uint8_t evspot_net_udp_parse(libnet_t *libnet_ctx, uint8_t *raw, size_t raw_len)
   n_size = raw_len - sizeof(struct libnet_udp_hdr);
 
 
-  fprintf(stderr, "UDP packet (sport %d)->(dport %d)\n", ntohs(hudp->uh_sport), ntohs(hudp->uh_dport));
+  _I("UDP packet (sport %d)->(dport %d)\n", ntohs(hudp->uh_sport), ntohs(hudp->uh_dport));
 
   libnet_build_udp(
       ntohs(hudp->uh_sport), 

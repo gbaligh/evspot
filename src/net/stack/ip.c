@@ -21,9 +21,8 @@ uint8_t evspot_stack_ipv4(struct evspot_stack_s *pCtx)
   size_t n_size = 0;
   struct in_addr source, dest;
 
-
   if (raw_len < sizeof(struct ip)) {
-    TCDPRINTF("Wrong packet size");
+    _E("Wrong packet size");
     return 1;
   }
 
@@ -32,7 +31,7 @@ uint8_t evspot_stack_ipv4(struct evspot_stack_s *pCtx)
   n_size = raw_len - sizeof(struct iphdr);
 
   if (h->version != 0x4) {
-    TCDPRINTF("Only IPv4 is supported");
+    _E("Only IPv4 is supported");
     return 1;
   }
 
@@ -46,13 +45,13 @@ uint8_t evspot_stack_ipv4(struct evspot_stack_s *pCtx)
   memset(&dest, 0, sizeof(dest));
   dest.s_addr = h->daddr;
 
-  TCDPRINTF("Header IP");
-  TCDPRINTF("   |-%-21s : %d", "IP Version", (unsigned int)h->version);
-  TCDPRINTF("   |-%-21s : %d", "TTL", (unsigned int)h->ttl);
-  TCDPRINTF("   |-%-21s : %d", "Protocol", (unsigned int)h->protocol);
-  TCDPRINTF("   |-%-21s : %d", "Checksum", ntohs(h->check));
-  TCDPRINTF("   |-%-21s : %s", "Source IP", inet_ntoa(source));
-  TCDPRINTF("   |-%-21s : %s", "Destination IP", inet_ntoa(dest));
+  _I("Header IP");
+  _I("   |-%-21s : %d", "IP Version", (unsigned int)h->version);
+  _I("   |-%-21s : %d", "TTL", (unsigned int)h->ttl);
+  _I("   |-%-21s : %d", "Protocol", (unsigned int)h->protocol);
+  _I("   |-%-21s : %d", "Checksum", ntohs(h->check));
+  _I("   |-%-21s : %s", "Source IP", inet_ntoa(source));
+  _I("   |-%-21s : %s", "Destination IP", inet_ntoa(dest));
 
   return 0;
 }

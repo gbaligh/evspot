@@ -28,7 +28,7 @@ uint8_t evspot_pcapoff_init(evspot_link_t **ppCtx, const char *name)
  
   _pCtx = (struct evspot_pcap_s *)tcmalloc(sizeof(struct evspot_pcap_s));
   if (_pCtx == (struct evspot_pcap_s *)0) {
-    TCDPRINTF("Error memory allocation");
+    _E("Error memory allocation");
     return 1;
   }
   memset(_pCtx, 0, sizeof(struct evspot_pcap_s));
@@ -53,14 +53,14 @@ uint8_t evspot_pcapoff_start(evspot_link_t *pCtx)
 
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_PCAPOFF_MAGIC, return 1);
 
-  TCDPRINTF("Using the offline file %s", _pCtx->name);
+  _I("Using the offline file %s", _pCtx->name);
   _pCtx->pcap = pcap_open_offline(_pCtx->name, errbuf);
   if (_pCtx->pcap == NULL) {
-    TCDPRINTF("Error creating pcap handler: %s", errbuf);
+    _E("Error creating pcap handler: %s", errbuf);
     return 1;
   }
 
-  TCDPRINTF("Using %s with file %s: DATALINK(%s:%s)",
+  _I("Using %s with file %s: DATALINK(%s:%s)",
       pcap_lib_version(),
       _pCtx->name, 
       pcap_datalink_val_to_name(pcap_datalink(_pCtx->pcap)),
@@ -79,7 +79,7 @@ uint8_t evspot_pcapoff_getfd(evspot_link_t *pCtx, int *pfd)
   _fd = pcap_get_selectable_fd(_pCtx->pcap);
 
   if (_fd < 0) {
-    TCDPRINTF("Error getting file descriptor !");
+    _E("Error getting file descriptor !");
     return 1;
   }
 
@@ -108,7 +108,7 @@ uint8_t evspot_pcapoff_read(evspot_link_t *pCtx, void *user, void (*cb)(void*,co
       break;
     /* if an error occurred while reading the packet */
     case -1:
-      TCDPRINTF("Error pcap_next(): %s", pcap_geterr(_pCtx->pcap));
+      _E("Error pcap_next(): %s", pcap_geterr(_pCtx->pcap));
       return 1;
     /* if  packets  are  being read  from  a  ``savefile''  and  there  are  no  more  packets to read from the savefile */
     case -2:

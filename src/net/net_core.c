@@ -29,13 +29,13 @@ uint8_t evspot_net_init(struct evspot_app_s *pAppCtx, evspot_net_t **ppCtx)
   struct evspot_net_ctx_s *_pCtx = NULL;
 
   if (pAppCtx == NULL) {
-    TCDPRINTF("Event base is NULL");
+    _E("Event base is NULL");
     return 1;
   }
 
   _pCtx = (struct evspot_net_ctx_s *)tcmalloc(sizeof(struct evspot_net_ctx_s));
   if (_pCtx == NULL) {
-    TCDPRINTF("allocation failed");
+    _E("allocation failed");
     return 1;
   }
 
@@ -43,7 +43,7 @@ uint8_t evspot_net_init(struct evspot_app_s *pAppCtx, evspot_net_t **ppCtx)
   
   _pCtx->devs = tcptrlistnew(); 
   if (_pCtx->devs == NULL) {
-    TCDPRINTF("Error creating devices list");
+    _E("Error creating devices list");
     tcfree(_pCtx);
     return 1;
   }
@@ -65,7 +65,7 @@ uint8_t evspot_net_start(evspot_net_t *pCtx)
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_NET_CTX_MAGIC, return 1);
 
   if ((numDev = tcptrlistnum(_pCtx->devs)) == 0) {
-    TCDPRINTF("Error: no device created for network");
+    _E("Error: no device created for network");
     return 1;
   }
 
@@ -73,16 +73,16 @@ uint8_t evspot_net_start(evspot_net_t *pCtx)
     evspot_dev_t *_pDevCtx = tcptrlistval(_pCtx->devs, _i);
 
     if (evspot_dev_open(_pDevCtx) != 0) {
-      TCDPRINTF("Error starting device %p", _pDevCtx);
+      _E("Error starting device %p", _pDevCtx);
       continue;
     }
 
-    TCDPRINTF("Started capture on device %p", _pDevCtx);
+    _I("Started capture on device %p", _pDevCtx);
     _aDev++;
   }
 
   if (!_aDev) {
-    TCDPRINTF("No active device: %d", _aDev);
+    _E("No active device: %d", _aDev);
     return 1;
   }
 
@@ -97,11 +97,11 @@ uint8_t evspot_net_dev_add(evspot_net_t *pCtx, const char *name, const uint32_t 
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_NET_CTX_MAGIC, return 1);
 
   if (evspot_dev_init(&_pDevCtx, name, type, _pCtx->app->base) != 0) {
-    TCDPRINTF("Error initializing device %s", name);
+    _E("Error initializing device %s", name);
     return 1;
   }
 
-  TCDPRINTF("New device created (%s:%p)", name, _pDevCtx);
+  _I("New device created (%s:%p)", name, _pDevCtx);
 
   tcptrlistpush(_pCtx->devs, _pDevCtx);
 

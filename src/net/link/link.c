@@ -34,12 +34,12 @@ uint8_t evspot_link_init(evspot_link_t **ppCtx, uint32_t linktype, const char *n
   struct evspot_link_s *_pCtx = (struct evspot_link_s *)0;
 
   if (linktype > sizeof(link_ops)/sizeof(link_ops[0])) {
-    TCDPRINTF("Error LINK type");
+    _E("Error LINK type");
     return 1;
   }
 
   if (link_ops[linktype]->init == NULL) {
-    TCDPRINTF("Error init operation not handled");
+    _E("Error init operation not handled");
     return 1;
   }
 
@@ -58,12 +58,12 @@ uint8_t evspot_link_start(evspot_link_t *pCtx)
   struct evspot_link_s *_pCtx = (struct evspot_link_s *)pCtx;
   
   if (_pCtx->type > sizeof(link_ops)/sizeof(link_ops[0])) {
-    TCDPRINTF("Error LINK type");
+    _E("Error LINK type");
     return 1;
   }
 
   if (link_ops[_pCtx->type]->start == NULL) {
-    TCDPRINTF("Error start operation not handled");
+    _E("Error start operation not handled");
     return 1;
   }
 
@@ -75,12 +75,12 @@ uint8_t evspot_link_getfd(evspot_link_t *pCtx, int *pfd)
   struct evspot_link_s *_pCtx = (struct evspot_link_s *)pCtx;
   
   if (_pCtx->type > sizeof(link_ops)/sizeof(link_ops[0])) {
-    TCDPRINTF("Error LINK type");
+    _E("Error LINK type");
     return 1;
   }
 
   if (link_ops[_pCtx->type]->getfd == NULL) {
-    TCDPRINTF("Error getfd operation not handled");
+    _E("Error getfd operation not handled");
     return 1;
   }
   
@@ -92,12 +92,12 @@ uint8_t evspot_link_read(evspot_link_t *pCtx, void *user, void (*cb)(void*,const
   struct evspot_link_s *_pCtx = (struct evspot_link_s *)pCtx;
 
   if (_pCtx->type > sizeof(link_ops)/sizeof(link_ops[0])) {
-    TCDPRINTF("Error LINK type");
+    _E("Error LINK type");
     return 1;
   }
 
   if (link_ops[_pCtx->type]->read == NULL) {
-    TCDPRINTF("Error read operation not handled");
+    _E("Error read operation not handled");
     return 1;
   }
  
@@ -109,12 +109,12 @@ uint8_t evspot_link_stop(evspot_link_t *pCtx)
   struct evspot_link_s *_pCtx = (struct evspot_link_s *)pCtx;
 
   if (_pCtx->type > sizeof(link_ops)/sizeof(link_ops[0])) {
-    TCDPRINTF("Error LINK type");
+    _E("Error LINK type");
     return 1;
   }
 
   if (link_ops[_pCtx->type]->stop == NULL) {
-    TCDPRINTF("Error stop operation not handled");
+    _E("Error stop operation not handled");
     return 1;
   }
  
@@ -126,12 +126,12 @@ uint8_t evspot_link_free(evspot_link_t *pCtx)
   struct evspot_link_s *_pCtx = (struct evspot_link_s *)pCtx;
 
   if (_pCtx->type > sizeof(link_ops)/sizeof(link_ops[0])) {
-    TCDPRINTF("Error LINK type");
+    _E("Error LINK type");
     return 1;
   }
 
   if (link_ops[_pCtx->type]->free == NULL) {
-    TCDPRINTF("Error free operation not handled");
+    _E("Error free operation not handled");
     return 1;
   }
  
