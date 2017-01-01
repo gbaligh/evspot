@@ -12,10 +12,11 @@ EasyVision CaptivePortal
 Default configuration file is stored in `/etc/evspot.conf`, for now, only 2 parameters are supported:
 - url: UAM server to use, must start with `http(s)://`.
 - interface: Local interface to listen to.
+- pcap_file: Local PCAP file to use.
 
 # Compilation
 - Just run `make` for release version
-- When compiled with `make debug`, a test version will be generated, that will use a pcap file under `/tmp/evspot.pcap` as input.
+- When compiled with `make debug` there will be more message printed.
 
 # Execute
 `sudo ./evspot` is the way to execute the program, no argument supproted yet.
