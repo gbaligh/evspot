@@ -87,6 +87,10 @@ int main(int argc, char *argv[])
     TCDPRINTF("Error creating Signal handler");
 	}
 
+  if (event_priority_set(_pCtx->evsig, 0) != 0) {
+    TCDPRINTF("Error setting priority for evnnt");
+  }
+
 	if (evsignal_add(_pCtx->evsig, NULL) != 0) {
     TCDPRINTF("Error adding Signal handler into libevent");
 	}
@@ -97,8 +101,16 @@ int main(int argc, char *argv[])
   }
 
   /* Load devices from config */
-  if (evspot_net_dev_add(_pCtx->net, opts->intf) != 0) {
-    TCDPRINTF("Error adding interface %s", opts->intf);
+  if (opts->intf != NULL) {
+    if (evspot_net_dev_add(_pCtx->net, opts->intf, EVSPOT_LINK_TYPE_PCAP) != 0) {
+      TCDPRINTF("Error adding interface %s", opts->intf);
+    }
+  }
+
+  if (opts->pcap_file != NULL) {
+    if (evspot_net_dev_add(_pCtx->net, opts->pcap_file, EVSPOT_LINK_TYPE_PCAPOFF) != 0) {
+      TCDPRINTF("Error Loading file %s", opts->pcap_file);
+    }
   }
 
   if (evspot_net_start(_pCtx->net) != 0) {
@@ -107,6 +119,7 @@ int main(int argc, char *argv[])
   }
 
   TCDPRINTF("Start EvSpot");
+    
 	if (event_base_dispatch(_pCtx->base) != 0) {
     TCDPRINTF("Error starting libevent loop");
     goto APPEXIT;

@@ -2,10 +2,6 @@
 #ifndef __EVSPOT_NET_LINK_H__
 #define __EVSPOt_NET_LINK_H__
 
-#define EVSPOT_LINK_TYPE_PCAP   0
-#define EVSPOT_LINK_TYPE_SRAW   1
-#define EVSPOT_LINK_TYPE_NFQ    2
-
 struct evspot_link_s {
   uint32_t magic;
   uint32_t type;

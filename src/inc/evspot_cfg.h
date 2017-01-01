@@ -7,6 +7,7 @@ typedef struct evspot_cfg_s evspot_cfg_t;
 typedef struct evspot_cfg_opt_s {
   struct event_config  *evopt; 
   const char *intf;
+  const char *pcap_file;
   const char *url;
 } evspot_cfg_opt_t;
 

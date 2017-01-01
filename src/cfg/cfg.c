@@ -44,9 +44,11 @@ struct evspot_cfg_s {
 
 struct evspot_cfg_key_s evspot_cfg_keys[] = {
   {"url",         CONFIG_TYPE_STRING, offsetof(struct evspot_cfg_opt_s, url),   
-   "UAM server URL to redirect clients to, using HTTP 302."},
+    "UAM server URL to redirect clients to, using HTTP 302."},
   {"interface",   CONFIG_TYPE_STRING, offsetof(struct evspot_cfg_opt_s, intf),  
-   "Interface for clients packets."},
+    "Interface for clients packets."},
+  {"pcapfile",    CONFIG_TYPE_STRING, offsetof(struct evspot_cfg_opt_s, pcap_file),
+    "Use PCAP savedfile."},
 };
 
 uint8_t evspot_cfg_help(void)
@@ -61,6 +63,7 @@ uint8_t evspot_cfg_help(void)
 uint8_t evspot_cfg_init(evspot_cfg_t **ppCtx)
 {
   struct evspot_cfg_s *_pCtx = (struct evspot_cfg_s *)0;
+  //const struct timeval max_interval[1] = {{3, 0}};
 
   _pCtx = (struct evspot_cfg_s *)tcmalloc(sizeof(struct evspot_cfg_s));
   if (_pCtx == (struct evspot_cfg_s *)0) {
@@ -83,6 +86,9 @@ uint8_t evspot_cfg_init(evspot_cfg_t **ppCtx)
     tcfree(_pCtx);
     return 1;
   }
+
+  /* Run at most 16 callbacks before checking for other events. */
+  //event_config_set_max_dispatch_interval(_pCtx->opt->evopt, max_interval, 16, 0);
 
   event_config_avoid_method(_pCtx->opt->evopt, "select");
 

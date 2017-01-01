@@ -89,14 +89,14 @@ uint8_t evspot_net_start(evspot_net_t *pCtx)
   return 0;
 }
 
-uint8_t evspot_net_dev_add(evspot_net_t *pCtx, const char *name)
+uint8_t evspot_net_dev_add(evspot_net_t *pCtx, const char *name, const uint32_t type)
 {
   struct evspot_net_ctx_s *_pCtx = (struct evspot_net_ctx_s *)pCtx;
   evspot_dev_t *_pDevCtx = NULL;
 
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_NET_CTX_MAGIC, return 1);
 
-  if (evspot_dev_init(&_pDevCtx, name, _pCtx->app->base) != 0) {
+  if (evspot_dev_init(&_pDevCtx, name, type, _pCtx->app->base) != 0) {
     TCDPRINTF("Error initializing device %s", name);
     return 1;
   }

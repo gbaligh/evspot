@@ -19,9 +19,13 @@
 #include "link.h"
 
 extern evspot_link_ops_t pcap_ops;
+extern evspot_link_ops_t pcapoff_ops;
 
 static const evspot_link_ops_t *link_ops[] = {
   [EVSPOT_LINK_TYPE_PCAP] = &pcap_ops,
+  [EVSPOT_LINK_TYPE_SRAW] = NULL,
+  [EVSPOT_LINK_TYPE_NFQ] = NULL,
+  [EVSPOT_LINK_TYPE_PCAPOFF] = &pcapoff_ops,
 };
 
 uint8_t evspot_link_init(evspot_link_t **ppCtx, uint32_t linktype, const char *name)
