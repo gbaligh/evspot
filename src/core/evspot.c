@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 {
   evspot_app_t *_pCtx = pEvspotAppCtx;
   evspot_cfg_opt_t *opts = NULL;
-	int ret = EXIT_SUCCESS;
+  int ret = EXIT_SUCCESS;
 
   NOT_USED(argc);
   NOT_USED(argv);
@@ -66,34 +66,34 @@ int main(int argc, char *argv[])
     goto APPEXIT;
   }
 
-	/* Set Log callback for libevent */
-	event_set_log_callback(evspot_libevent_log_cb);
+  /* Set Log callback for libevent */
+  event_set_log_callback(evspot_libevent_log_cb);
 
   /* Handling fatal errors */
   event_set_fatal_callback(evspot_libevent_fatal_cb);
 
-	_pCtx->base = event_base_new_with_config(opts->evopt);
-	if (_pCtx->base == NULL) {
+  _pCtx->base = event_base_new_with_config(opts->evopt);
+  if (_pCtx->base == NULL) {
     TCDPRINTF("Erro creating libevent pool");
     goto APPEXIT;
-	}
+  }
 
-	if (event_base_priority_init(_pCtx->base, 2) != 0) {
+  if (event_base_priority_init(_pCtx->base, 2) != 0) {
     TCDPRINTF("Error setting priority for libevent");
-	}
+  }
 
-	_pCtx->evsig = evsignal_new(_pCtx->base, SIGINT, &evspot_signal_cb, (void *)_pCtx);
-	if (_pCtx->evsig == NULL) {
+  _pCtx->evsig = evsignal_new(_pCtx->base, SIGINT, &evspot_signal_cb, (void *)_pCtx);
+  if (_pCtx->evsig == NULL) {
     TCDPRINTF("Error creating Signal handler");
-	}
+  }
 
   if (event_priority_set(_pCtx->evsig, 0) != 0) {
     TCDPRINTF("Error setting priority for evnnt");
   }
 
-	if (evsignal_add(_pCtx->evsig, NULL) != 0) {
+  if (evsignal_add(_pCtx->evsig, NULL) != 0) {
     TCDPRINTF("Error adding Signal handler into libevent");
-	}
+  }
 
   if (evspot_net_init(_pCtx, &_pCtx->net) != 0) {
     TCDPRINTF("Could not start Network stack");
@@ -119,11 +119,11 @@ int main(int argc, char *argv[])
   }
 
   TCDPRINTF("Start EvSpot");
-    
-	if (event_base_dispatch(_pCtx->base) != 0) {
+
+  if (event_base_dispatch(_pCtx->base) != 0) {
     TCDPRINTF("Error starting libevent loop");
     goto APPEXIT;
-	}
+  }
   TCDPRINTF("Shutting down EvSpot");
 
   evspot_net_stop(_pCtx->net);
@@ -131,16 +131,16 @@ int main(int argc, char *argv[])
   evspot_net_destroy(_pCtx->net);
 
 APPEXIT:
-	/* Free SIG */
+  /* Free SIG */
   event_free(_pCtx->evsig);
-  
+
   /* Free libEvent */
-	event_base_free(_pCtx->base);
+  event_base_free(_pCtx->base);
 
   /* Free cfg */  
   evspot_cfg_destroy(_pCtx->cfg);
 
-	return ret;
+  return ret;
 }
 
 // vim: ts=2:sw=2:expandtab
