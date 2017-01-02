@@ -3,6 +3,7 @@
 #define __EVSPOt_NET_LINK_H__
 
 struct evspot_link_s {
+  /* base */
   uint32_t magic;
   uint32_t type;
   const char *name;
@@ -10,8 +11,10 @@ struct evspot_link_s {
 typedef struct evspot_link_s evspot_link_t;
 
 struct evspot_pcap_s {
+  /* base */
   uint32_t magic;
   uint32_t type;
+  /* extrat */
   const char *name;
   pcap_t *pcap;
   uint8_t direction;
@@ -21,6 +24,16 @@ struct evspot_pcap_s {
   uint8_t verbose;
 };
 typedef struct evspot_pcap_s evspot_pcap_t;
+
+struct evspot_nfqueue_s {
+  /* base */
+  uint32_t magic;
+  uint32_t type;
+  /* extrat */
+  const char *name;
+  struct nfq_handle *nfq;
+};
+typedef struct evspot_nfqueue_s evspot_nfqueue_t;
 
 struct evspot_link_ops_s {
   uint8_t (*init)(evspot_link_t **ppCtx, const char *name);

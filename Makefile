@@ -8,7 +8,7 @@ SRC_EXT = c
 # Path to the source directory, relative to the makefile
 SRC_PATH = src
 # Space-separated pkg-config libraries used by this project
-LIBS = libevent libconfig tokyocabinet
+LIBS = libevent libconfig tokyocabinet libnetfilter_queue
 # General compiler flags
 COMPILE_FLAGS = -Wall -Wextra -g
 # Additional release-specific flags

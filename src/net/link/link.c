@@ -20,11 +20,12 @@
 
 extern evspot_link_ops_t pcap_ops;
 extern evspot_link_ops_t pcapoff_ops;
+extern evspot_link_ops_t nfqueue_ops;
 
 static const evspot_link_ops_t *link_ops[] = {
   [EVSPOT_LINK_TYPE_PCAP] = &pcap_ops,
   [EVSPOT_LINK_TYPE_SRAW] = NULL,
-  [EVSPOT_LINK_TYPE_NFQ] = NULL,
+  [EVSPOT_LINK_TYPE_NFQ] = &nfqueue_ops,
   [EVSPOT_LINK_TYPE_PCAPOFF] = &pcapoff_ops,
 };
 
@@ -35,6 +36,11 @@ uint8_t evspot_link_init(evspot_link_t **ppCtx, uint32_t linktype, const char *n
 
   if (linktype > sizeof(link_ops)/sizeof(link_ops[0])) {
     _E("Error LINK type");
+    return 1;
+  }
+
+  if (link_ops[linktype] == NULL) {
+    TCDPRINTF("Not supported link type");
     return 1;
   }
 
