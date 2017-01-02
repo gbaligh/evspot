@@ -40,7 +40,7 @@ uint8_t evspot_link_init(evspot_link_t **ppCtx, uint32_t linktype, const char *n
   }
 
   if (link_ops[linktype] == NULL) {
-    TCDPRINTF("Not supported link type");
+    _E("Not supported link type");
     return 1;
   }
 

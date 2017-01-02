@@ -12,16 +12,32 @@ do { \
   fprintf(stderr, __VA_ARGS__); \
   fprintf(stderr, "\n"); \
 } while (0)  
-#else
-#define _D(...)
-#endif
 
+#define _I(...) \
+do { \
+  fprintf(stderr, "%s:%s(%d): ", __FILE__, __func__, __LINE__); \
+  fprintf(stderr, __VA_ARGS__); \
+  fprintf(stderr, "\n"); \
+} while(0)
+
+#define _E(...) \
+do { \
+  fprintf(stderr, "%s:%s(%d): ", __FILE__, __func__, __LINE__); \
+  fprintf(stderr, "[ERROR]"); \
+  fprintf(stderr, __VA_ARGS__); \
+  fprintf(stderr, "\n"); \
+} while(0)
+
+#define ASSERT(_c_) assert((_c_))
+
+#else
+
+#define _D(...)
 #define _I(...) \
 do { \
   fprintf(stderr, __VA_ARGS__); \
   fprintf(stderr, "\n"); \
 } while(0)
-
 #define _E(...) \
 do { \
   fprintf(stderr, "[ERROR]"); \
@@ -29,11 +45,9 @@ do { \
   fprintf(stderr, "\n"); \
 } while(0)
 
-#ifdef DEBUG
-#define ASSERT(_c_) assert((_c_))
-#else
 #define ASSERT(_c_) 
-#endif
+
+#endif /* DEBUG */
 
 #define NOT_USED(_v_) if (_v_) {}
 

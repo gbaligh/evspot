@@ -32,6 +32,7 @@ struct evspot_nfqueue_s {
   /* extrat */
   const char *name;
   struct nfq_handle *nfq;
+  struct nfq_q_handle *qh;
 };
 typedef struct evspot_nfqueue_s evspot_nfqueue_t;
 

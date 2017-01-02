@@ -95,7 +95,6 @@ uint8_t evspot_pcapoff_read(evspot_link_t *pCtx, void *user, void (*cb)(void*,co
   const u_char *pkt_data = NULL;
   int _ret = -2;
 
-
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_PCAPOFF_MAGIC, return 1);
 
   _ret = pcap_next_ex(_pCtx->pcap, &pkt_header, &pkt_data);
