@@ -97,12 +97,12 @@ uint8_t evspot_dev_init(evspot_dev_t **ppCtx, const char *name, const uint32_t t
       close(_fd);
     }
 
-    _D("Device %s[%d]", _pCtx->name, _pCtx->index); 
-    _D("Device %s[%s]", _pCtx->name, inet_ntoa(_pCtx->ipv4));
-    _D("Device %s[%s]", _pCtx->name, inet_ntoa(_pCtx->mask)); 
-    _D("Device %s[%s]", _pCtx->name, inet_ntoa(_pCtx->broadaddr)); 
-    _D("Device %s[%d]", _pCtx->name, _pCtx->mtu);
-    _D("Device %s[0x%4X]", _pCtx->name, _pCtx->flags);
+    _D("Device %s[index:%d]", _pCtx->name, _pCtx->index); 
+    _D("Device %s[IPv4:%s]", _pCtx->name, inet_ntoa(_pCtx->ipv4));
+    _D("Device %s[Mask:%s]", _pCtx->name, inet_ntoa(_pCtx->mask)); 
+    _D("Device %s[Broad:%s]", _pCtx->name, inet_ntoa(_pCtx->broadaddr)); 
+    _D("Device %s[MTU:%d]", _pCtx->name, _pCtx->mtu);
+    _D("Device %s[FLAGS:0x%4X]", _pCtx->name, _pCtx->flags);
   }
 
   /* Ok */
@@ -181,7 +181,10 @@ static void evspot_dev_event_handler(evutil_socket_t fd, short event, void *arg)
 
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_DEV_MAGIC, return);
 
-  evspot_link_getfd(_pCtx->link, &_fd);
+  if (evspot_link_getfd(_pCtx->link, &_fd) != 0) {
+    _E("Getting file descriptor from link");
+    return;
+  }
 
   if (fd != _fd) {
     _E("Event from socket(%d) not from %d", fd, _fd);
@@ -189,7 +192,10 @@ static void evspot_dev_event_handler(evutil_socket_t fd, short event, void *arg)
   }
 
   if (event & EV_READ) {
-    evspot_link_read(_pCtx->link, _pCtx, evspot_dev_link_handler);
+    if (evspot_link_read(_pCtx->link, _pCtx, evspot_dev_link_handler) != 0) {
+      _E("Read from link");
+      return;
+    }
   }
 }
 
@@ -200,13 +206,10 @@ static void evspot_dev_link_handler(void *pCtx, const size_t s, const uint8_t *b
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_DEV_MAGIC, return);
 
   if (s == 0) {
+    _D("Zero packet size");
     return;
   }
 
-  if (bytes == NULL) {
-    return;
-  }
- 
   evspot_stack_parse(_pCtx->stack, (uint8_t *)bytes, s);
 }
 

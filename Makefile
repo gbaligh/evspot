@@ -10,7 +10,7 @@ SRC_PATH = src
 # Space-separated pkg-config libraries used by this project
 LIBS = libevent libconfig tokyocabinet libnetfilter_queue
 # General compiler flags
-COMPILE_FLAGS = -Wall -Wextra -g
+COMPILE_FLAGS = -Wall -Wextra -g -D_BSD_SOURCE
 # Additional release-specific flags
 RCOMPILE_FLAGS = -D NDEBUG -fpack-struct
 # Additional debug-specific flags
@@ -20,9 +20,9 @@ INCLUDES = -I $(SRC_PATH) -I src/inc
 # General linker settings
 LINK_FLAGS = -lpcap -lnet
 # Additional release-specific linker settings
-RLINK_FLAGS = -lnet -lpcap
+RLINK_FLAGS = -lnet -lpcap -D_BSD_SOURCE
 # Additional debug-specific linker settings
-DLINK_FLAGS = -lnet -lpcap
+DLINK_FLAGS = -lnet -lpcap -D_BSD_SOURCE 
 # Destination directory, like a jail or mounted system
 DESTDIR = /
 # Install path (bin/ is appended automatically)

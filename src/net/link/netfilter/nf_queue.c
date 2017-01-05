@@ -83,8 +83,10 @@ uint8_t evspot_nfqueue_getfd(evspot_link_t *pCtx, int *pfd)
 
   _fd = nfq_fd(_pCtx->nfq);
 
-  if (_fd < 0)
+  if (_fd < 0) {
+    _D("Invalid file descriptor");
     return 1;
+  }
 
   *pfd = _fd;
 
@@ -101,8 +103,16 @@ uint8_t evspot_nfqueue_read(evspot_link_t *pCtx, void *user, void (*cb)(void*,co
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_NFQUEUE_MAGIC, return 1);
 
   _fd = nfq_fd(_pCtx->nfq);
+  if (_fd < 0) {
+    _D("Invalid file descriptor");
+    return 1;
+  }
 
   rv = recv(_fd, buf, sizeof(buf), 0);
+  if (rv <= 0) {
+    _D("No bytes received");
+    return 1;
+  }
 
   nfq_handle_packet(_pCtx->nfq, buf, rv);
 
