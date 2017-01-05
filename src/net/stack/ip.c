@@ -11,6 +11,36 @@
 #include <evspot_net.h>
 #include "stack.h"
 
+static struct evspot_stack_ip_upper_s {
+  uint8_t proto;
+  const char *desc;
+  uint8_t (*stack_cb)(struct evspot_stack_s *pCtx);
+} gIpUpper[] = {
+  {IPPROTO_TCP,  "TCP",   &evspot_stack_tcp},
+  {IPPROTO_UDP,  "UDP",   &evspot_stack_udp},
+  {IPPROTO_ICMP, "ICMP",  &evspot_stack_icmp}
+};
+
+static uint8_t evspot_stack_ip_parser(struct evspot_stack_s *pCtx, uint8_t proto)
+{
+  unsigned int _i = 0;
+
+  for (_i=0; _i < sizeof(gIpUpper)/sizeof(gIpUpper[0]); ++_i) {
+    if (gIpUpper[_i].proto == proto) {
+      if (gIpUpper[_i].stack_cb != NULL) {
+        return gIpUpper[_i].stack_cb(pCtx);
+      }
+      else {
+        _E("Header %s not supported", gIpUpper[_i].desc);
+        return 0;
+      }
+    }
+  }
+
+  _E("IP protocol 0x%2X not supported", proto);
+  return 0;
+}
+
 uint8_t evspot_stack_ipv4(struct evspot_stack_s *pCtx)
 {
   const struct iphdr *h = NULL;
@@ -20,7 +50,7 @@ uint8_t evspot_stack_ipv4(struct evspot_stack_s *pCtx)
   size_t n_size = 0;
   struct in_addr source, dest;
 
-  if (raw_len < sizeof(struct ip)) {
+  if (raw_len < sizeof(struct iphdr)) {
     _E("Wrong packet size");
     return 1;
   }
@@ -52,7 +82,7 @@ uint8_t evspot_stack_ipv4(struct evspot_stack_s *pCtx)
   _I("   |-%-21s : %s", "Source IP", inet_ntoa(source));
   _I("   |-%-21s : %s", "Destination IP", inet_ntoa(dest));
 
-  return 0;
+  return evspot_stack_ip_parser(pCtx, h->protocol);
 }
 
 // vim: ts=2:sw=2:expandtab

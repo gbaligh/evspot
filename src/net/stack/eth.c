@@ -13,7 +13,7 @@
 #include <evspot_net.h>
 #include "stack.h"
 
-struct evspot_stack_eth_upper_s {
+static struct evspot_stack_eth_upper_s {
   uint16_t ethtype;
   const char *desc;
   uint8_t (*stack_cb)(struct evspot_stack_s *pCtx);
