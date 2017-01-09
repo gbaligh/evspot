@@ -40,6 +40,8 @@ uint8_t evspot_stack_udp(struct evspot_stack_s *pCtx);
 
 uint8_t evspot_stack_icmp(struct evspot_stack_s *pCtx);
 
+uint8_t evspot_stack_arp(struct evspot_stack_s *pCtx);
+
 uint8_t evspot_stack_init(evspot_stack_t **ppCtx);
 
 uint8_t evspot_stack_parse(evspot_stack_t *pCtx, uint8_t *raw, size_t raw_len);

@@ -18,11 +18,11 @@ DCOMPILE_FLAGS = -D DEBUG -fpack-struct
 # Add additional include paths
 INCLUDES = -I $(SRC_PATH) -I src/inc
 # General linker settings
-LINK_FLAGS = -lpcap -lnet
+LINK_FLAGS = -lpcap -lnet -lz -lbz2 -lrt -lpthread -lm -lc
 # Additional release-specific linker settings
-RLINK_FLAGS = -lnet -lpcap -D_BSD_SOURCE
+RLINK_FLAGS = -lnet -lpcap -lz -lbz2 -lrt -lpthread -lm -lc
 # Additional debug-specific linker settings
-DLINK_FLAGS = -lnet -lpcap -D_BSD_SOURCE 
+DLINK_FLAGS = -lnet -lpcap -lz -lbz2 -lrt -lpthread -lm -lc
 # Destination directory, like a jail or mounted system
 DESTDIR = /
 # Install path (bin/ is appended automatically)

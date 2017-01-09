@@ -21,7 +21,7 @@ static struct evspot_stack_eth_upper_s {
   {ETHERTYPE_IP,      "IPv4",             &evspot_stack_ipv4},
   {ETHERTYPE_IPV6,    "IPv6",             NULL},
   {ETHERTYPE_IPX,     "IPX",              NULL},
-  {ETHERTYPE_ARP,     "ARP",              NULL},
+  {ETHERTYPE_ARP,     "ARP",              &evspot_stack_arp},
   {ETHERTYPE_REVARP,  "RevARP",           NULL},
   {ETHERTYPE_AT,      "AppleTalk",        NULL},
   {ETHERTYPE_AARP,    "AppleTalk ARP",    NULL},
