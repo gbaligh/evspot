@@ -60,6 +60,11 @@ uint8_t evspot_stack_eth(struct evspot_stack_s *pCtx)
   uint8_t *n_raw = NULL;
   size_t n_size = 0;
 
+  if (raw == NULL) {
+    _E("Packet RAW is not valid: NULL");
+    return 1;
+  }
+
   if (raw_len < sizeof(struct ethhdr)) {
     _E("Wrong packet size");
     return 1;
