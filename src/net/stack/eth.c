@@ -61,12 +61,12 @@ uint8_t evspot_stack_eth(struct evspot_stack_s *pCtx)
   size_t n_size = 0;
 
   if (raw == NULL) {
-    _E("Packet RAW is not valid: NULL");
+    _D("Packet RAW is not valid: NULL");
     return 1;
   }
 
   if (raw_len < sizeof(struct ethhdr)) {
-    _E("Wrong packet size");
+    _D("Wrong packet size");
     return 1;
   }
 
@@ -95,7 +95,7 @@ uint8_t evspot_stack_vlan(struct evspot_stack_s *pCtx)
   size_t n_size = 0;
 
   if (raw_len < sizeof(struct vlan_tag)) {
-    _E("Wrong packet size");
+    _D("Wrong packet size");
     return 1;
   }
 

@@ -31,6 +31,10 @@ uint8_t evspot_stack_tcp(struct evspot_stack_s *pCtx)
   n_raw = (raw + sizeof(struct tcphdr));
   n_size = raw_len - sizeof(struct tcphdr);
 
+  pCtx->tcp = h;
+  pCtx->payload = n_raw;
+  pCtx->payload_len = n_size;
+
   _I("Header TCP");
   _I("   |-%-21s : %d", "Source Port", ntohs(h->source));
   _I("   |-%-21s : %d", "Destination Port", ntohs(h->dest));

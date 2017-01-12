@@ -31,6 +31,10 @@ uint8_t evspot_stack_icmp(struct evspot_stack_s *pCtx)
   n_raw = (raw + sizeof(struct icmphdr));
   n_size = raw_len - sizeof(struct icmphdr);
 
+  pCtx->icmp = h;
+  pCtx->payload = n_raw;
+  pCtx->payload_len = n_size;
+
   _I("Header ICMP");
   _I("   |-%-21s : %d", "Type", h->type);
   _I("   |-%-21s : %d", "Code", h->code);

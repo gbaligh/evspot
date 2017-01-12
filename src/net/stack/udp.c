@@ -30,6 +30,10 @@ uint8_t evspot_stack_udp(struct evspot_stack_s *pCtx)
   n_raw = (raw + sizeof(struct udphdr));
   n_size = raw_len - sizeof(struct udphdr);
 
+  pCtx->udp = h;
+  pCtx->payload = n_raw;
+  pCtx->payload_len = n_size;
+
   _I("Header UDP");
   _I("   |-%-21s : %d", "Source Port", ntohs(h->source));
   _I("   |-%-21s : %d", "Destination Port", ntohs(h->dest));

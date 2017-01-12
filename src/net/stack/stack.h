@@ -18,14 +18,20 @@ struct evspot_stack_s {
 
   /* VLAN */
 
+  /* ICMP */
+  const struct icmphdr *icmp;
+
   /* ARP */
+  const struct arphdr *arp;
 
-  /* PPP */
-
-  /* IPv4/IPv6 */
+  /* IPv4 */
   const struct iphdr *ipv4;
 
-  /* TCP/UDP */
+  /* TCP */
+  const struct tcphdr *tcp;
+
+  /* UDP */
+  const struct udphdr *udp;
 };
 
 uint8_t evspot_stack_eth(struct evspot_stack_s *pCtx);
