@@ -58,17 +58,17 @@ uint8_t evspot_net_start(evspot_net_t *pCtx)
 {
   struct evspot_net_ctx_s *_pCtx = (struct evspot_net_ctx_s *)pCtx;
   int _i = 0;
-  int numDev = 0;
+  int _nbEl = 0;
   int _aDev = 0;
 
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_NET_CTX_MAGIC, return 1);
 
-  if ((numDev = tcptrlistnum(_pCtx->devs)) == 0) {
+  if ((_nbEl = tcptrlistnum(_pCtx->devs)) == 0) {
     _E("Error: no device created for network");
     return 1;
   }
 
-  for (_i = 0; _i < numDev; ++_i) {
+  for (_i = 0; _i < _nbEl; ++_i) {
     evspot_dev_t *_pDevCtx = tcptrlistval(_pCtx->devs, _i);
 
     if (evspot_dev_open(_pDevCtx) != 0) {
@@ -107,16 +107,43 @@ uint8_t evspot_net_dev_add(evspot_net_t *pCtx, const char *name, const uint32_t 
   return 0;
 }
 
+uint8_t evspot_net_dev_remove(evspot_net_t *pCtx, const char *name)
+{
+  struct evspot_net_ctx_s *_pCtx = (struct evspot_net_ctx_s *)pCtx;
+  evspot_dev_t *_pDevCtx = NULL;
+  int _nbEl = 0;
+  int _i = 0;
+
+  EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_NET_CTX_MAGIC, return 1);
+
+  _nbEl = tcptrlistnum(_pCtx->devs);
+  if (_nbEl == 0) {
+    _E("There is no device added.");
+    return 1;
+  }
+
+  for (_i = 0; _i < _nbEl; ++_i) {
+    _pDevCtx = (evspot_dev_t *)tcptrlistval(_pCtx->devs, _i);
+    if (strcmp(name, evspot_dev_getname(_pDevCtx)) == 0) {
+      _pDevCtx = tcptrlistremove(_pCtx->devs, _i);
+      evspot_dev_close(_pDevCtx);
+      evspot_dev_free(_pDevCtx);
+    }
+  }
+
+  return 0;
+}
+
 uint8_t evspot_net_stop(evspot_net_t *pCtx)
 {
   struct evspot_net_ctx_s *_pCtx = (struct evspot_net_ctx_s *)pCtx;
   int _i = 0;
-  int numDev = 0;
+  int _nbEl = 0;
 
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_NET_CTX_MAGIC, return 1);
 
-  if ((numDev = tcptrlistnum(_pCtx->devs)) != 0) {
-    for (_i = 0; _i < numDev; ++_i) {
+  if ((_nbEl = tcptrlistnum(_pCtx->devs)) != 0) {
+    for (_i = 0; _i < _nbEl; ++_i) {
       evspot_dev_t *_pDevCtx = tcptrlistval(_pCtx->devs, _i);
       evspot_dev_close(_pDevCtx);
     }
@@ -129,12 +156,12 @@ uint8_t evspot_net_destroy(evspot_net_t *pCtx)
 {
   struct evspot_net_ctx_s *_pCtx = (struct evspot_net_ctx_s *)pCtx;
   int _i = 0;
-  int numDev = 0;
+  int _nbEl = 0;
 
   EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_NET_CTX_MAGIC, return 1);
  
-  if ((numDev = tcptrlistnum(_pCtx->devs)) != 0) {
-    for (_i = 0; _i < numDev; ++_i) {
+  if ((_nbEl = tcptrlistnum(_pCtx->devs)) != 0) {
+    for (_i = 0; _i < _nbEl; ++_i) {
       evspot_dev_t *_pDevCtx = tcptrlistval(_pCtx->devs, _i);
       evspot_dev_free(_pDevCtx);
     }

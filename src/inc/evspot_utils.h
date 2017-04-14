@@ -9,14 +9,14 @@
 #define _D(...) \
 do { \
   fprintf(stderr, "%s:%s(%d): ", __FILE__, __func__, __LINE__); \
-  fprintf(stderr, __VA_ARGS__); \
+  fprintf(stderr, ##__VA_ARGS__); \
   fprintf(stderr, "\n"); \
 } while (0)  
 
 #define _I(...) \
 do { \
   fprintf(stderr, "%s:%s(%d): ", __FILE__, __func__, __LINE__); \
-  fprintf(stderr, __VA_ARGS__); \
+  fprintf(stderr, ##__VA_ARGS__); \
   fprintf(stderr, "\n"); \
 } while(0)
 
@@ -24,7 +24,7 @@ do { \
 do { \
   fprintf(stderr, "%s:%s(%d): ", __FILE__, __func__, __LINE__); \
   fprintf(stderr, "[ERROR]"); \
-  fprintf(stderr, __VA_ARGS__); \
+  fprintf(stderr, ##__VA_ARGS__); \
   fprintf(stderr, "\n"); \
 } while(0)
 
@@ -35,13 +35,13 @@ do { \
 #define _D(...)
 #define _I(...) \
 do { \
-  fprintf(stderr, __VA_ARGS__); \
+  fprintf(stderr, ##__VA_ARGS__); \
   fprintf(stderr, "\n"); \
 } while(0)
 #define _E(...) \
 do { \
   fprintf(stderr, "[ERROR]"); \
-  fprintf(stderr, __VA_ARGS__); \
+  fprintf(stderr, ##__VA_ARGS__); \
   fprintf(stderr, "\n"); \
 } while(0)
 

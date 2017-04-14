@@ -23,6 +23,7 @@ static void evspot_stack_arp_dump(void)
   int psp = 0;
 
   if (arp_table == NULL) {
+    _D("ARP table is NULL");
     return;
   }
 

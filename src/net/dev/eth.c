@@ -51,6 +51,7 @@ uint8_t evspot_dev_init(evspot_dev_t **ppCtx, const char *name, const uint32_t t
 
   _pCtx = (struct evspot_dev_s *)tcmalloc(sizeof(struct evspot_dev_s));
   if (_pCtx == (struct evspot_dev_s *)0) {
+    _E("Error allocating memory");
     return 1;
   }
 
@@ -109,6 +110,15 @@ uint8_t evspot_dev_init(evspot_dev_t **ppCtx, const char *name, const uint32_t t
   *ppCtx = _pCtx;
 
   return 0;
+}
+
+const char *evspot_dev_getname(evspot_dev_t *pCtx)
+{
+  struct evspot_dev_s *_pCtx = (struct evspot_dev_s *)pCtx;
+
+  EVSPOT_CHECK_MAGIC_CTX(_pCtx, EVSPOT_DEV_MAGIC, return NULL);
+
+  return _pCtx->name;
 }
 
 uint8_t evspot_dev_open(evspot_dev_t *pCtx)

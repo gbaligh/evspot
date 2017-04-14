@@ -25,7 +25,7 @@ static struct evspot_stack_eth_upper_s {
   {ETHERTYPE_REVARP,  "RevARP",           NULL},
   {ETHERTYPE_AT,      "AppleTalk",        NULL},
   {ETHERTYPE_AARP,    "AppleTalk ARP",    NULL},
-  {ETHERTYPE_LOOPBACK,"Test",             NULL},
+  {ETHERTYPE_LOOPBACK,"Test Loop",        NULL},
   {ETHERTYPE_TRAIL,   "Trail",            NULL},
   {ETHERTYPE_VLAN,    "VLAN",             &evspot_stack_vlan},
   {ETH_P_PPP_SES,     "PPP SESSION",      NULL},

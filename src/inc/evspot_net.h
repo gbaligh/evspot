@@ -25,6 +25,8 @@ typedef struct evspot_dev_s evspot_dev_t;
 
 typedef struct evspot_stack_s evspot_stack_t;
 
+/* Network stack API */
+
 uint8_t evspot_net_init(struct evspot_app_s *pAppCtx, evspot_net_t **ppCtx);
 
 uint8_t evspot_net_start(evspot_net_t *pCtx);
@@ -35,9 +37,13 @@ uint8_t evspot_net_stop(evspot_net_t *pCtx);
 
 uint8_t evspot_net_destroy(evspot_net_t *pCtx);
 
+/* Device API */
+
 uint8_t evspot_dev_init(evspot_dev_t **ppCtx, const char *name, const uint32_t type, struct event_base *base);
 
 uint8_t evspot_dev_open(evspot_dev_t *pCtx);
+
+const char *evspot_dev_getname(evspot_dev_t *pCtx);
 
 uint8_t evspot_dev_setpromisc(evspot_dev_t *pCtx, uint8_t promisc);
 
