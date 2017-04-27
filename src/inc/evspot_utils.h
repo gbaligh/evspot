@@ -75,6 +75,18 @@ do { \
     EVSPOT_CHECK_MAGIC((__CTX__), (__MAGIC__), __CMD__); \
   } while(0)
 
+typedef void (ev_mem_destroy_f)(void *p);
+
+void *ev_mem_alloc(size_t size, ev_mem_destroy_f *df);
+
+void *ev_mem_zalloc(size_t size, ev_mem_destroy_f *df);
+
+void *ev_mem_ref(void *p);
+
+void *ev_mem_unref(void *p);
+
+uint32_t ev_mem_refs(const void *p);
+
 #endif /* __EVSIP_UTL_H__ */
 
 // vim: ts=2:sw=2:expandtab

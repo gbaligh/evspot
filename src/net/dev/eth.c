@@ -220,6 +220,7 @@ static void evspot_dev_link_handler(void *pCtx, const size_t s, const uint8_t *b
     return;
   }
 
+  /* start parsing buffer */
   evspot_stack_parse(_pCtx->stack, (uint8_t *)bytes, s);
 }
 
