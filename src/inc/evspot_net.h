@@ -2,8 +2,6 @@
 #ifndef __EVSIP_NET_H__
 #define __EVSIP_NET_H__
 
-#include <libnet.h>
-
 #include <net/ethernet.h>
 #include <netinet/ip.h>
 #include <netinet/in.h>

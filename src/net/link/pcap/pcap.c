@@ -73,11 +73,7 @@ uint8_t evspot_pcap_start(evspot_link_t *pCtx)
   
   if (pcap_set_timeout(_pCtx->pcap, _pCtx->timeout) < 0) {
     _E("Error timeout");
-  }
-
-  if (pcap_setdirection(_pCtx->pcap, _pCtx->direction) < 0) {
-    _E("Error setting direction for device %s: %s", _pCtx->name, pcap_geterr(_pCtx->pcap));
-  }
+  } 
 
   if (pcap_activate(_pCtx->pcap) != 0) {
     _E("Error activate libpcap [%s] for device %s", pcap_geterr(_pCtx->pcap), _pCtx->name);
@@ -85,17 +81,27 @@ uint8_t evspot_pcap_start(evspot_link_t *pCtx)
     return 1;
   }
 
-  if (!pcap_getnonblock(_pCtx->pcap, errbuf)) {
-    if (pcap_setnonblock(_pCtx->pcap, 1, errbuf) < 0) {
-      _E("Error setting nonblock for device %s: %s", _pCtx->name, errbuf);
-    }
-  }
-
   _I("Using %s with device %s: DATALINK(%s:%s)",
       pcap_lib_version(),
       _pCtx->name, 
       pcap_datalink_val_to_name(pcap_datalink(_pCtx->pcap)),
       pcap_datalink_val_to_description(pcap_datalink(_pCtx->pcap)));
+
+  if (pcap_datalink(_pCtx->pcap) != DLT_EN10MB) {
+    _E("Device %s doesn't provide Ethernet headers - not supported", _pCtx->name);
+    pcap_close(_pCtx->pcap);
+    return 2;
+  }
+
+  if (pcap_setdirection(_pCtx->pcap, _pCtx->direction) < 0) {
+    _E("Error setting direction for device %s: %s", _pCtx->name, pcap_geterr(_pCtx->pcap));
+  }
+
+  if (!pcap_getnonblock(_pCtx->pcap, errbuf)) {
+    if (pcap_setnonblock(_pCtx->pcap, 1, errbuf) < 0) {
+      _E("Error setting nonblock for device %s: %s", _pCtx->name, errbuf);
+    }
+  }
 
   return 0;
 }

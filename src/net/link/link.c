@@ -21,10 +21,11 @@
 extern evspot_link_ops_t pcap_ops;
 extern evspot_link_ops_t pcapoff_ops;
 extern evspot_link_ops_t nfqueue_ops;
+extern evspot_link_ops_t rsocket_ops;
 
 static const evspot_link_ops_t *link_ops[] = {
   [EVSPOT_LINK_TYPE_PCAP] = &pcap_ops,
-  [EVSPOT_LINK_TYPE_SRAW] = NULL,
+  [EVSPOT_LINK_TYPE_SRAW] = &rsocket_ops,
   [EVSPOT_LINK_TYPE_NFQ] = &nfqueue_ops,
   [EVSPOT_LINK_TYPE_PCAPOFF] = &pcapoff_ops,
 };
