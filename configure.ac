@@ -10,7 +10,6 @@ AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
 AC_PROG_CC
-AC_PROG_RANLIB
 AM_PROG_LIBTOOL
 
 # Checks for libraries.
@@ -45,6 +44,7 @@ AC_CHECK_FUNCS([inet_ntoa memset socket])
 PKG_CHECK_MODULES([LIBCONFIG], [libconfig])
 PKG_CHECK_MODULES([TOKYOCABINET], [tokyocabinet])
 PKG_CHECK_MODULES([LIBEVENT], [libevent])
+PKG_CHECK_MODULES([NFQUEUE], [libnetfilter_queue])
 
 AC_CONFIG_FILES([Makefile
                  doc/Makefile

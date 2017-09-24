@@ -56,14 +56,18 @@ int main(int argc, char *argv[])
   /* Load file */
   if (evspot_cfg_load(_pCtx->cfg, _pCtx->filecfg) != 0) {
     _E("Error loading configuration file");
-    return -255;
+    /* Free cfg */
+    evspot_cfg_destroy(_pCtx->cfg);
+    return EXIT_FAILURE;
   }
 
   /* get all options loaded */
   opts = evspot_cfg_get_opt(_pCtx->cfg);
   if (opts == NULL) {
     _E("FATAL: Options not found %p", opts);
-    return -255;
+    /* Free cfg */
+    evspot_cfg_destroy(_pCtx->cfg);
+    return EXIT_FAILURE;
   }
 
   /* Set Log callback for libevent */
